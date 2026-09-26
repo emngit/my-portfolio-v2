@@ -1,26 +1,363 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────
+   EXACT render.com design tokens (from source)
+   ───────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Palette — exact values from :root{} block */
+  --color-white: #fff;
+  --color-black: #000;
+  --color-gray-25:  #fafafa;
+  --color-gray-50:  #f0f0f0;
+  --color-gray-100: #e3e3e3;
+  --color-gray-200: #c7c7c7;
+  --color-gray-300: #b3b3b3;
+  --color-gray-400: #8f8f8f;
+  --color-gray-500: #6b6b6b;
+  --color-gray-600: #4d4d4d;
+  --color-gray-700: #272727;
+  --color-gray-800: #141414;
+  --color-gray-900: #0d0d0d;
+
+  --color-purple-25:  #fbfaff;
+  --color-purple-50:  #f4f0ff;
+  --color-purple-100: #e7dbff;
+  --color-purple-200: #d1b8ff;
+  --color-purple-300: #c29eff;
+  --color-purple-400: #aa77fd;
+  --color-purple-500: #9b52fb;
+  --color-purple-600: #8a05ff;
+  --color-purple-700: #48008c;
+  --color-purple-800: #2a0052;
+  --color-purple-900: #1c0037;
+
+  --color-green-300: #1efe9d;
+  --color-green-400: #00db7c;
+  --color-green-100: #b8ffd7;
+
+  /* Semantic tokens — dark theme */
+  --color-background:           var(--color-gray-900);
+  --color-background-secondary: var(--color-gray-800);
+  --color-background-inverted:  var(--color-white);
+  --color-border:               var(--color-gray-700);
+  --color-border-input:         var(--color-gray-600);
+  --color-text-primary:         var(--color-white);
+  --color-text-primary-inverted:var(--color-gray-900);
+  --color-text-secondary:       var(--color-gray-100);
+  --color-text-faint:           var(--color-gray-300);
+
+  /* Surface tokens — cards / panels */
+  --color-surface:              var(--color-gray-800);  /* card bg */
+  --color-surface-raised:       var(--color-gray-900);  /* inset bg */
+
+  /* Grid column system */
+  --column-count: 16;
+  --column-scale: 1440px;   /* desktop reference */
+  --column-size:  calc(var(--column-scale) / var(--column-count));  /* 90px */
+  --color-bg-grid: var(--color-gray-700);   /* dark grid line color */
+
+  /* Layout */
+  --nav-height: 66px;
+  --global-ease: cubic-bezier(.9, .1, .1, .9);
+  --global-transition: .35s var(--global-ease);
+
+  /* Theme-switchable tokens — dark defaults */
+  --nav-scrolled-bg: rgba(13,13,13,0.94);
+  --hero-gradient:   linear-gradient(135deg, var(--color-purple-900) 0%, transparent 28%), var(--color-background);
+}
+
+/* ─── Light theme override ─── */
+[data-theme="light"] {
+  --color-background:           #f9fafb;
+  --color-background-secondary: #f3f4f6;
+  --color-background-inverted:  var(--color-gray-900);
+  --color-border:               #e5e7eb;
+  --color-border-input:         #d1d5db;
+  --color-text-primary:         #0d0d0d;
+  --color-text-primary-inverted:var(--color-white);
+  --color-text-secondary:       #374151;
+  --color-text-faint:           #4b5563;
+  --color-bg-grid:              #e5e7eb;
+  --nav-scrolled-bg:            rgba(249,250,251,0.96);
+  --hero-gradient:              linear-gradient(135deg, rgba(221,207,255,0.25) 0%, transparent 30%), #f9fafb;
+
+  /* Surface tokens — light mode */
+  --color-surface:              #ffffff;
+  --color-surface-raised:       #f3f4f6;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-text-primary);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ─── Reset ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; background: var(--color-background); }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: 'PP Neue Montreal', -apple-system, "Segoe UI", system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  cursor: none;
 }
+
+/* ─── CURSOR (custom, not from Render) ─── */
+.cursor-dot  {
+  width: 7px; height: 7px;
+  background: var(--color-purple-400);
+  border-radius: 50%;
+  position: fixed; pointer-events: none; z-index: 99999;
+  transform: translate(-50%,-50%);
+}
+.cursor-ring {
+  width: 26px; height: 26px;
+  border: 1.5px solid rgba(170,119,253,.4);
+  border-radius: 50%;
+  position: fixed; pointer-events: none; z-index: 99998;
+  transform: translate(-50%,-50%);
+  transition: width .18s, height .18s, border-color .18s;
+}
+
+/* ─── GRID — exact Render column grid ─── */
+.bg-grid {
+  background-image:
+    linear-gradient(90deg, var(--color-bg-grid) 1px, transparent 0),
+    repeating-linear-gradient(
+      180deg,
+      var(--color-bg-grid),
+      var(--color-bg-grid) 1px,
+      transparent 0,
+      transparent calc(var(--column-scale) / var(--column-count))
+    );
+  background-size:
+    calc(var(--column-scale) / var(--column-count)) 100%,
+    100% 100%;
+  background-position-x: -1px;
+}
+
+/* ─── TYPOGRAPHY — exact Render scale ─── */
+/* heading-lg-new: used on homepage h1 */
+/* Render exact: ~80px / weight-300 / letter-spacing -.02em / line-height 1.05 */
+.text-heading-lg-new {
+  font-family: 'Roobert', sans-serif;
+  letter-spacing: -.02em;
+  font-size: clamp(44px, 6.5vw, 88px);
+  font-weight: 300;
+  line-height: 1.05;
+}
+.text-heading-xl-new {
+  font-family: 'Roobert', sans-serif;
+  letter-spacing: -.02em;
+  font-size: clamp(44px, 6.5vw, 88px);
+  font-weight: 300;
+  line-height: 1.05;
+}
+.text-heading-sm-new {
+  font-family: 'Roobert', sans-serif;
+  letter-spacing: -.012em;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.14;
+}
+.text-body-xl-new {
+  letter-spacing: 0;
+  font-size: clamp(18px, 1.5vw, 22px);
+  font-weight: 400;
+  line-height: 1.5;
+}
+.text-body-lg-new {
+  letter-spacing: .002em;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+.text-body-sm-new {
+  letter-spacing: .01em;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.text-body-xs-new {
+  letter-spacing: .01em;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* ─── BUTTONS — Render's two button styles ─── */
+/* Primary: white/inverted fill, text slides on hover, purple sweep */
+.btn-render-primary {
+  position: relative; z-index: 1;
+  display: inline-flex; align-items: center; gap: 10px;
+  overflow: hidden;
+  height: 48px; padding: 0 24px;
+  background: var(--color-text-primary);
+  color: var(--color-background);
+  font-size: 15px; font-weight: 500;
+  white-space: nowrap;
+  border: none; cursor: pointer;
+  transition: color var(--global-transition), background var(--global-transition);
+}
+.btn-render-primary::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0;
+  background: var(--color-purple-600);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--global-transition);
+}
+.btn-render-primary:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.btn-render-primary:hover { color: var(--color-white); background: var(--color-text-primary); }
+.btn-render-primary span { position: relative; z-index: 1; }
+
+/* Secondary: transparent border */
+.btn-render-secondary {
+  position: relative; z-index: 1;
+  display: inline-flex; align-items: center; gap: 10px;
+  overflow: hidden;
+  height: 48px; padding: 0 24px;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 15px; font-weight: 500;
+  white-space: nowrap;
+  border: 1px solid var(--color-border); cursor: pointer;
+  transition: border-color var(--global-transition), color var(--global-transition);
+}
+.btn-render-secondary::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0;
+  background: var(--color-surface);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--global-transition);
+}
+.btn-render-secondary:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.btn-render-secondary span { position: relative; z-index: 1; }
+
+/* ─── CARD / PANEL ─── */
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+.panel-inner {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+}
+.panel-purple {
+  background: rgba(138, 5, 255, 0.08);
+  border: 1px solid rgba(138, 5, 255, 0.25);
+}
+
+/* ─── STATUS BADGES ─── */
+.badge-green {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 500;
+  color: var(--color-green-400);
+  background: rgba(0,219,124,.08);
+  border: 1px solid rgba(0,219,124,.2);
+  padding: 2px 8px; border-radius: 3px;
+}
+.badge-purple {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 500;
+  color: var(--color-purple-300);
+  background: rgba(138,5,255,.1);
+  border: 1px solid rgba(138,5,255,.25);
+  padding: 2px 8px; border-radius: 3px;
+}
+.badge-gray {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 500;
+  color: var(--color-gray-300);
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--color-border);
+  padding: 2px 8px; border-radius: 3px;
+}
+
+/* ─── GRADIENT TEXT ─── */
+.gradient-text {
+  background: linear-gradient(90deg, var(--color-purple-400), #ff9a5c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+/* Purple only */
+.gradient-text-purple {
+  background: linear-gradient(135deg, var(--color-purple-300), var(--color-purple-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── CARD HOVER ─── */
+.card-hover {
+  border: 1px solid var(--color-border);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.card-hover:hover {
+  border-color: rgba(170,119,253,.45);
+  box-shadow: 0 8px 32px rgba(0,0,0,.15);
+}
+
+/* ─── INPUT ─── */
+.input-field {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  padding: .7rem 1rem;
+  outline: none;
+  transition: border-color .2s;
+}
+.input-field::placeholder { color: var(--color-gray-500); }
+.input-field:focus { border-color: rgba(138,5,255,.5); }
+
+/* ─── TIMELINE ─── */
+.tl-line {
+  background: linear-gradient(180deg, var(--color-purple-500) 0%, rgba(155,82,251,.1) 100%);
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes float-y {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+@keyframes blink   { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes pulse-green {
+  0%,100% { box-shadow: 0 0 0 0 rgba(0,219,124,.5); }
+  50%      { box-shadow: 0 0 0 5px rgba(0,219,124,0); }
+}
+@keyframes bars-in {
+  from { scaleY: 0; }
+  to   { scaleY: 1; }
+}
+
+.animate-float  { animation: float-y 3.5s ease-in-out infinite; }
+.animate-float2 { animation: float-y 3.5s ease-in-out infinite 1.4s; }
+.animate-blink  { animation: blink 1s step-end infinite; }
+.animate-pulse-green { animation: pulse-green 1.8s ease infinite; }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--color-background); }
+::-webkit-scrollbar-thumb { background: var(--color-gray-700); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-purple-600); }
+
+/* ─── PARTICLES ─── */
+#ptcl {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+}
+
+/* ─── SECTION dividers ─── */
+.section-border-t { border-top: 1px solid var(--color-border); }
+.section-border-b { border-bottom: 1px solid var(--color-border); }

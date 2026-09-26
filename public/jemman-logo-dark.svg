@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1368" height="392" viewBox="0 0 1368 392" role="img" aria-label="J.EMMAN">
+  <title>J.EMMAN</title>
+  <defs>
+    <filter id="extrude" x="-2%" y="-2%" width="140%" height="140%">
+      <feMorphology operator="dilate" radius="8" in="SourceGraphic" result="dilated"/>
+      <feFlood flood-color="#3a3a3a" result="sc"/>
+      <feComposite in="sc" in2="dilated" operator="in" result="base"/>
+      <feOffset dx="1" dy="1" in="base" result="s1"/>
+      <feOffset dx="2" dy="2" in="base" result="s2"/>
+      <feOffset dx="3" dy="3" in="base" result="s3"/>
+      <feOffset dx="4" dy="4" in="base" result="s4"/>
+      <feOffset dx="5" dy="5" in="base" result="s5"/>
+      <feOffset dx="6" dy="6" in="base" result="s6"/>
+      <feOffset dx="7" dy="7" in="base" result="s7"/>
+      <feOffset dx="8" dy="8" in="base" result="s8"/>
+      <feOffset dx="9" dy="9" in="base" result="s9"/>
+      <feOffset dx="10" dy="10" in="base" result="s10"/>
+      <feOffset dx="11" dy="11" in="base" result="s11"/>
+      <feOffset dx="12" dy="12" in="base" result="s12"/>
+      <feOffset dx="13" dy="13" in="base" result="s13"/>
+      <feOffset dx="14" dy="14" in="base" result="s14"/>
+      <feOffset dx="15" dy="15" in="base" result="s15"/>
+      <feOffset dx="16" dy="16" in="base" result="s16"/>
+      <feOffset dx="17" dy="17" in="base" result="s17"/>
+      <feOffset dx="18" dy="18" in="base" result="s18"/>
+      <feOffset dx="19" dy="19" in="base" result="s19"/>
+      <feOffset dx="20" dy="20" in="base" result="s20"/>
+      <feOffset dx="21" dy="21" in="base" result="s21"/>
+      <feOffset dx="22" dy="22" in="base" result="s22"/>
+      <feOffset dx="23" dy="23" in="base" result="s23"/>
+      <feOffset dx="24" dy="24" in="base" result="s24"/>
+      <feOffset dx="25" dy="25" in="base" result="s25"/>
+      <feOffset dx="26" dy="26" in="base" result="s26"/>
+      <feOffset dx="27" dy="27" in="base" result="s27"/>
+      <feOffset dx="28" dy="28" in="base" result="s28"/>
+      <feOffset dx="29" dy="29" in="base" result="s29"/>
+      <feOffset dx="30" dy="30" in="base" result="s30"/>
+      <feOffset dx="31" dy="31" in="base" result="s31"/>
+      <feOffset dx="32" dy="32" in="base" result="s32"/>
+      <feOffset dx="33" dy="33" in="base" result="s33"/>
+      <feOffset dx="34" dy="34" in="base" result="s34"/>
+      <feOffset dx="35" dy="35" in="base" result="s35"/>
+      <feOffset dx="36" dy="36" in="base" result="s36"/>
+      <feMerge>
+        <feMergeNode in="base"/>
+        <feMergeNode in="s1"/>
+        <feMergeNode in="s2"/>
+        <feMergeNode in="s3"/>
+        <feMergeNode in="s4"/>
+        <feMergeNode in="s5"/>
+        <feMergeNode in="s6"/>
+        <feMergeNode in="s7"/>
+        <feMergeNode in="s8"/>
+        <feMergeNode in="s9"/>
+        <feMergeNode in="s10"/>
+        <feMergeNode in="s11"/>
+        <feMergeNode in="s12"/>
+        <feMergeNode in="s13"/>
+        <feMergeNode in="s14"/>
+        <feMergeNode in="s15"/>
+        <feMergeNode in="s16"/>
+        <feMergeNode in="s17"/>
+        <feMergeNode in="s18"/>
+        <feMergeNode in="s19"/>
+        <feMergeNode in="s20"/>
+        <feMergeNode in="s21"/>
+        <feMergeNode in="s22"/>
+        <feMergeNode in="s23"/>
+        <feMergeNode in="s24"/>
+        <feMergeNode in="s25"/>
+        <feMergeNode in="s26"/>
+        <feMergeNode in="s27"/>
+        <feMergeNode in="s28"/>
+        <feMergeNode in="s29"/>
+        <feMergeNode in="s30"/>
+        <feMergeNode in="s31"/>
+        <feMergeNode in="s32"/>
+        <feMergeNode in="s33"/>
+        <feMergeNode in="s34"/>
+        <feMergeNode in="s35"/>
+        <feMergeNode in="s36"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path d="M49.80 264L111.20 264C137.80 264 154.80 250.60 161.80 224.20L194 104L128.60 104L100.20 210L64.20 210 M203.60 266C223.20 266 239.40 250 239.40 230.60C239.40 211.20 223.20 195.40 203.60 195.40C183.60 195.40 167.60 211.20 167.60 230.60C167.60 250 183.60 266 203.60 266 M343.40 264L376.20 264L390.60 210L350.60 210L359 179.20L344.20 179.20C338.60 179.20 334.20 174.60 334.20 168.60C334.20 162.60 338.60 158 344.20 158L404.60 158L419 104L343.40 104C297.60 104 259.60 140 259.60 184C259.60 228 297.60 264 343.40 264 M383.40 264L446.80 264L474.60 160.40C476 154.80 481.80 151 488 152.60C493.80 154 496.80 160.40 495.40 166L469.20 264L532.80 264L560.60 160.40C562 154.80 567.80 151 574 152.60C579.80 154 582.80 160.40 581.40 166L555.20 264L618.60 264L661.40 104L426.20 104 M626.40 264L689.80 264L717.60 160.40C719 154.80 724.80 151 731 152.60C736.80 154 739.80 160.40 738.40 166L712.20 264L775.80 264L803.60 160.40C805 154.80 810.80 151 817 152.60C822.80 154 825.80 160.40 824.40 166L798.20 264L861.60 264L904.40 104L669.20 104 M1039 264L1039.20 104L913.40 104L870.40 264L934.40 264L945 224.60L972.40 224.60L972.60 264M966.40 182C957.60 182 950.20 174.80 950.20 166C950.20 157 957.60 149.80 966.40 149.80C975.20 149.80 982.40 157 982.40 166C982.40 174.80 975.20 182 966.40 182 M1035.40 264L1098.80 264L1126.20 161.60C1128 154.80 1135.20 150.20 1142.40 152.20C1149.40 154 1153 161.40 1151.20 168.40L1125.40 264L1188.80 264L1231.60 104L1078.20 104" filter="url(#extrude)"/>
+  <path d="M49.80 264L111.20 264C137.80 264 154.80 250.60 161.80 224.20L194 104L128.60 104L100.20 210L64.20 210 M203.60 266C223.20 266 239.40 250 239.40 230.60C239.40 211.20 223.20 195.40 203.60 195.40C183.60 195.40 167.60 211.20 167.60 230.60C167.60 250 183.60 266 203.60 266 M343.40 264L376.20 264L390.60 210L350.60 210L359 179.20L344.20 179.20C338.60 179.20 334.20 174.60 334.20 168.60C334.20 162.60 338.60 158 344.20 158L404.60 158L419 104L343.40 104C297.60 104 259.60 140 259.60 184C259.60 228 297.60 264 343.40 264 M383.40 264L446.80 264L474.60 160.40C476 154.80 481.80 151 488 152.60C493.80 154 496.80 160.40 495.40 166L469.20 264L532.80 264L560.60 160.40C562 154.80 567.80 151 574 152.60C579.80 154 582.80 160.40 581.40 166L555.20 264L618.60 264L661.40 104L426.20 104 M626.40 264L689.80 264L717.60 160.40C719 154.80 724.80 151 731 152.60C736.80 154 739.80 160.40 738.40 166L712.20 264L775.80 264L803.60 160.40C805 154.80 810.80 151 817 152.60C822.80 154 825.80 160.40 824.40 166L798.20 264L861.60 264L904.40 104L669.20 104 M1039 264L1039.20 104L913.40 104L870.40 264L934.40 264L945 224.60L972.40 224.60L972.60 264M966.40 182C957.60 182 950.20 174.80 950.20 166C950.20 157 957.60 149.80 966.40 149.80C975.20 149.80 982.40 157 982.40 166C982.40 174.80 975.20 182 966.40 182 M1035.40 264L1098.80 264L1126.20 161.60C1128 154.80 1135.20 150.20 1142.40 152.20C1149.40 154 1153 161.40 1151.20 168.40L1125.40 264L1188.80 264L1231.60 104L1078.20 104" fill="#F5E642"/>
+</svg>
