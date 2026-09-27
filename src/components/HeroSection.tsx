@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import DinoGame from './DinoGame';
 
 /* Render-style pixel-arrow SVG (copied from actual Render source) */
 function PixelArrow({ size = 10 }: { size?: number }) {
@@ -265,7 +266,7 @@ export default function HeroSection() {
           }} />
 
           {/* Production panel */}
-          <div style={{ marginTop: 80, background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)' }}>
+          <div style={{ marginTop: 45, background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)' }}>
             {/* Panel header */}
             <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.12em', color: 'var(--color-gray-400)', textTransform: 'uppercase' }}>PRODUCTION</span>
@@ -277,12 +278,8 @@ export default function HeroSection() {
 
             {/* Service cards */}
             <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <ServiceCard name="app-backend" deploying>
-                <MetricCell label="MEMORY" accent />
-                <MetricCell label="CPU" accent />
-                <MetricCell label="INSTANCES" />
-                <MetricCell label="REQUESTS" />
-              </ServiceCard>
+              {/* app-backend replaced with Dino game */}
+              <DinoGame />
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <ServiceCard name="app-database" status="Available">
@@ -300,7 +297,7 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Purple color block — Render has a bold purple rectangle in the lower right */}
+          {/* Purple color block */}
           <motion.div
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
@@ -316,21 +313,6 @@ export default function HeroSection() {
             ))}
           </motion.div>
 
-          {/* Open to work chip */}
-          <motion.div
-            animate={{ y: [0, -4, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
-            style={{
-              position: 'absolute', bottom: 60, left: -10, zIndex: 10,
-              background: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              padding: '8px 14px',
-              display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--color-green-400)',
-            }}
-          >
-            <span className="animate-pulse-green" style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--color-green-400)', display: 'inline-block' }} />
-            Open to Work
-          </motion.div>
         </motion.div>
       </div>
 

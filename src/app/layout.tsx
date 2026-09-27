@@ -17,6 +17,7 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/roobert" />
         <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/pp-neue-montreal" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" />
       </head>
       <body className="antialiased">{children}</body>
     </html>

@@ -148,10 +148,10 @@ export default function Navbar() {
           <div className="hidden md:flex" style={{ gap: 12, alignItems: 'center' }}>
             <ThemeToggle />
             <button className="btn-render-secondary" style={{ height: 42, fontSize: 15, padding: '0 22px' }}>
-              <span>Resume</span>
+              <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 10, letterSpacing: '0.01em' }}>Resume</span>
             </button>
             <button className="btn-render-primary" onClick={() => go('#contact')} style={{ height: 42, fontSize: 15, padding: '0 22px' }}>
-              <span>Hire Me</span>
+              <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 10, letterSpacing: '0.01em' }}>Hire Me</span>
             </button>
           </div>
 
@@ -198,10 +198,10 @@ export default function Navbar() {
               ))}
               <div style={{ display: 'flex', gap: 10, marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--color-border)' }}>
                 <button className="btn-render-secondary" style={{ flex: 1, height: 40, fontSize: 13, justifyContent: 'center' }}>
-                  <span>Resume</span>
+                  <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 9 }}>Resume</span>
                 </button>
                 <button className="btn-render-primary" style={{ flex: 1, height: 40, fontSize: 13, justifyContent: 'center' }}>
-                  <span>Hire Me</span>
+                  <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 9 }}>Hire Me</span>
                 </button>
               </div>
             </div>
