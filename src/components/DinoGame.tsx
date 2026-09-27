@@ -164,6 +164,7 @@ export default function DinoGame() {
     wingFrame: 0,
     state: 'idle' as 'idle' | 'running' | 'dead',
     raf: 0,
+    pebbleOff: 0,   // frozen pebble offset on death
   });
 
   const startOrRestart = useCallback(() => {
@@ -292,19 +293,21 @@ export default function DinoGame() {
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(0, GROUND_Y + 2); ctx.lineTo(W, GROUND_Y + 2); ctx.stroke();
 
-      /* ground pebbles */
+      /* ground pebbles — only scroll when not dead */
       ctx.fillStyle = isDark ? '#2a2a4a' : '#aaa';
-      const off = (Date.now() / 6) % 55;
-      for (let x = -off; x < W; x += 55) {
+      if (s.state !== 'dead') s.pebbleOff = (Date.now() / 6) % 55;
+      for (let x = -s.pebbleOff; x < W; x += 55) {
         ctx.fillRect(x,      GROUND_Y + 6,  3, 2);
         ctx.fillRect(x + 28, GROUND_Y + 11, 2, 2);
       }
 
-      /* clouds */
+      /* clouds — only scroll when not dead */
       for (const c of s.clouds) {
         drawCloud(ctx, c, isDark);
-        c.x -= s.speed * 0.25;
-        if (c.x + 50 < 0) c.x = W + Math.random() * 160;
+        if (s.state !== 'dead') {
+          c.x -= s.speed * 0.25;
+          if (c.x + 50 < 0) c.x = W + Math.random() * 160;
+        }
       }
 
       /* ── idle / dead — no physics update ── */

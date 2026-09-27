@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* ── custom cursor ── */
+*, *::before, *::after {
+  cursor: url('/portal-gun-52.png') 0 0, auto !important;
+}
+
 /* ─────────────────────────────────────────────
    EXACT render.com design tokens (from source)
    ───────────────────────────────────────────── */
@@ -361,3 +366,94 @@ body {
 /* ─── SECTION dividers ─── */
 .section-border-t { border-top: 1px solid var(--color-border); }
 .section-border-b { border-bottom: 1px solid var(--color-border); }
+
+/* ── Portal Gateway ─────────────────────────────────────── */
+.portal-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.portal-gateway {
+  position: relative;
+  width: 390px;
+  height: 390px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: portal-breathe 5s ease-in-out infinite;
+}
+
+@keyframes portal-breathe {
+  0%, 100% { transform: scale(1);    }
+  50%       { transform: scale(1.04); }
+}
+
+.portal-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background: transparent;
+}
+
+.portal-img-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portal-img {
+  width: 255px;
+  max-width: 255px;
+  border-radius: 50%;
+  animation: portal-rotate 18s linear infinite;
+  filter: url(#portal-turbulence) drop-shadow(0 0 24px rgba(74,222,128,0.45));
+  transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), filter 0.4s ease;
+  will-change: transform, filter;
+}
+
+@keyframes portal-rotate {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+.portal-gateway:hover .portal-img {
+  animation-duration: 5s;
+  filter: url(#portal-turbulence)
+          drop-shadow(0 0 44px rgba(74,222,128,0.85))
+          drop-shadow(0 0 80px rgba(74,222,128,0.30));
+}
+
+.portal-egg-icon {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  filter: drop-shadow(0 0 8px #4ade80);
+}
+
+@media (max-width: 600px) {
+  .portal-gateway { width: 320px; height: 320px; }
+  .portal-img     { width: 200px; max-width: 200px; }
+}
+
+@media (max-width: 360px) {
+  .portal-gateway { width: 270px; height: 270px; }
+  .portal-img     { width: 170px; max-width: 170px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-gateway { animation: none; }
+  .portal-img     { animation: none; filter: drop-shadow(0 0 28px rgba(74,222,128,0.50)); }
+  .portal-canvas  { display: none; }
+}

@@ -2,6 +2,13 @@
 
 import { motion } from 'framer-motion';
 import { MapPin, Calendar } from 'lucide-react';
+import PortalGateway from './PortalGateway';
+import { useEffect, useRef } from 'react';
+
+const fadeUp = {
+  hidden:  { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } },
+};
 
 const experiences = [
   {
@@ -85,8 +92,70 @@ const experiences = [
 ];
 
 export default function ExperienceSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const portalRef   = useRef<HTMLDivElement>(null);
+  const visibleRef  = useRef(false);
+
+  useEffect(() => {
+    const PORTAL_H  = 390;
+    // how many px of scroll travel = full scale (enter zone + exit zone)
+    const ZONE = window.innerHeight * 0.10;
+
+    function onScroll() {
+      const section = sectionRef.current;
+      const el      = portalRef.current;
+      if (!section || !el) return;
+
+      const rect = section.getBoundingClientRect();
+      const vh   = window.innerHeight;
+
+      // Progress: 0 = section top just entered bottom of viewport
+      //           1 = section fully covering viewport (top ≤ 0, bottom ≥ vh)
+      // enterP: how far the top edge has scrolled past the viewport top (0→1 over ZONE px)
+      const enterP = Math.min(1, Math.max(0, -rect.top / ZONE));
+      // exitP:  how far the bottom edge still has before leaving (0→1 over ZONE px)
+      const exitP  = Math.min(1, Math.max(0, (rect.bottom - vh) / ZONE));
+      // combined: both must be 1 for full scale; minimum of the two drives scale
+      const t = Math.min(enterP, exitP);
+
+      // completely off screen — hide instantly, no transition
+      if (rect.top > vh || rect.bottom < 0) {
+        el.style.transition    = 'none';
+        el.style.transform     = 'scale(0)';
+        el.style.opacity       = '0';
+        el.style.pointerEvents = 'none';
+        visibleRef.current = false;
+        return;
+      }
+
+      // Smooth easing: ease the raw linear t with smoothstep
+      const eased = t * t * (3 - 2 * t);
+      const scale  = 0.15 + eased * 0.85;   // 0.15 → 1.0
+      const opacity = eased;                  // 0 → 1
+
+      // Compute clamped centre position
+      const centreY   = vh / 2;
+      const minTop    = rect.top    + PORTAL_H / 2;
+      const maxTop    = rect.bottom - PORTAL_H / 2;
+      const clampedCY = Math.min(Math.max(centreY, minTop), maxTop);
+      const top       = clampedCY - PORTAL_H / 2;
+
+      // Drive all values directly — no CSS transition so scroll drives it frame-by-frame
+      el.style.transition    = 'none';
+      el.style.top           = `${top}px`;
+      el.style.transform     = `scale(${scale})`;
+      el.style.opacity       = `${opacity}`;
+      el.style.pointerEvents = t >= 1 ? 'auto' : 'none';
+      visibleRef.current     = t >= 1;
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <section id="experience" className="bg-grid section-border-b" style={{ background: 'var(--color-background)', padding: '96px 0' }}>
+    <section ref={sectionRef} id="experience" className="bg-grid section-border-b" style={{ background: 'var(--color-background)', padding: '96px 0' }}>
       <div style={{ width: '100%', padding: '0 6.25%' }}>
 
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} style={{ marginBottom: 56 }}>
@@ -96,12 +165,13 @@ export default function ExperienceSection() {
           </h2>
         </motion.div>
 
-        {/* Timeline */}
-        <div style={{ position: 'relative', maxWidth: 900 }}>
-          {/* Vertical line */}
-          <div className="tl-line" style={{ position: 'absolute', left: 19, top: 0, width: 1, height: '100%' }} />
+        {/* Timeline — reserve right margin so fixed portal doesn't overlap */}
+        <div style={{ position: 'relative', paddingRight: 'calc(390px + 48px)' }} className="hidden-portal-spacer">
+          <div style={{ position: 'relative' }}>
+            {/* Vertical line */}
+            <div className="tl-line" style={{ position: 'absolute', left: 19, top: 0, width: 1, height: '100%' }} />
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             {experiences.map((exp, i) => (
               <motion.div key={exp.company} initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }} style={{ position: 'relative', paddingLeft: 56 }}>
 
@@ -148,7 +218,33 @@ export default function ExperienceSection() {
                 </div>
               </motion.div>
             ))}
+            </div>
           </div>
+        </div>
+
+        {/* Fixed portal — follows scroll via JS ref mutations, no React re-renders */}
+        <div
+          ref={portalRef}
+          className="hidden lg:block"
+          style={{
+            position: 'fixed',
+            right: '6.25vw',
+            top: '50vh',
+            zIndex: 10,
+            opacity: 0,
+            transform: 'scale(0)',
+            pointerEvents: 'none',
+          }}
+        >
+          <motion.div
+            className="portal-wrap"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            variants={fadeUp}
+          >
+            <PortalGateway />
+          </motion.div>
         </div>
       </div>
     </section>
