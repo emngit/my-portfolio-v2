@@ -138,7 +138,7 @@ export default function DinoGame() {
     idle:  HTMLImageElement;
   } | null>(null);
 
-  if (!imgs.current) {
+  if (!imgs.current && typeof window !== 'undefined') {
     imgs.current = {
       run:   Array.from({ length: RUN_FRAMES },   (_, i) => loadImage(runSrc(i))),
       fall:  Array.from({ length: FALL_FRAMES },  (_, i) => loadImage(fallSrc(i))),
