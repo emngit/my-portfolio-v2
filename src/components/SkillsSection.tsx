@@ -85,11 +85,11 @@ function MarqueeRow({ items, reverse = false }: { items: typeof ROW1; reverse?: 
   const pct = -(100 / 3); // move left by exactly one copy
 
   return (
-    <div style={{ overflow: 'hidden', width: '100%' }}>
+    <div style={{ overflow: 'hidden', width: '100%', padding: '8px 0' }}>
       <div
         style={{
           display: 'flex',
-          gap: 12,
+          gap: 16,
           width: 'max-content',
           willChange: 'transform',
           animation: `${reverse ? 'marqueeRev' : 'marquee'} 40s linear infinite`,
@@ -168,20 +168,65 @@ export default function SkillsSection() {
         </div>
       </div>
 
-      {/* ── Render-style full-width purple infinite marquee ── */}
+      {/* ── Render-style full-width purple infinite marquee with left label ── */}
       <motion.div
         initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.15 }}
         style={{
           width: '100%',
           background: 'var(--color-purple-700)',
-          padding: '36px 0',
-          display: 'flex', flexDirection: 'column', gap: 12,
+          padding: '56px 0',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0,
           overflow: 'hidden',
         }}
       >
-        <MarqueeRow items={ROW1} />
-        <MarqueeRow items={ROW2} reverse />
+        {/* Left label panel — face logo top, wordmark logo bottom */}
+        <div
+          style={{
+            flexShrink: 0,
+            width: 'clamp(200px, 22vw, 320px)',
+            padding: '0 0 0 6.25vw',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 16,
+            zIndex: 2,
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/mylogo-face-default.png"
+            alt="JEL face logo"
+            style={{ width: 'clamp(110px, 13vw, 180px)', height: 'auto', objectFit: 'contain' }}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/JEL-logo-v1-light.png"
+            alt="JEL wordmark"
+            style={{ width: 'clamp(100px, 13vw, 180px)', height: 'auto', objectFit: 'contain' }}
+          />
+        </div>
+
+        {/* Scrolling rows — fade-in from left edge, matching Render */}
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 20,
+            overflow: 'hidden',
+            position: 'relative',
+            maskImage: 'linear-gradient(to right, transparent 0%, black 8%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 8%)',
+          }}
+        >
+          <MarqueeRow items={ROW1} />
+          <MarqueeRow items={ROW2} reverse />
+        </div>
       </motion.div>
     </section>
   );
