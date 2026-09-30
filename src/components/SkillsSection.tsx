@@ -9,40 +9,40 @@ const groups = [
   { category: 'Databases',  color: '#ecd60e',                 skills: [{ name: 'MySQL / SQL', pct: 85 }, { name: 'PostgreSQL', pct: 82 }, { name: 'SQLite', pct: 75 }, { name: 'ER Modeling', pct: 78 }] },
 ];
 
-/* ── thesvg.org CDN — default variant for every icon ── */
-const T = 'https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons';
+/* ── Devicons CDN — universally reliable, every slug verified ── */
+const D = 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons';
 
 const ROW1: { name: string; url: string }[] = [
-  { name: 'JavaScript',        url: `${T}/javascript/default.svg` },
-  { name: 'Python',            url: `${T}/python/default.svg` },
-  { name: 'Java',              url: `${T}/java/default.svg` },
-  { name: 'HTML',              url: `${T}/html5/default.svg` },
-  { name: 'CSS',               url: `${T}/css/default.svg` },
-  { name: 'PHP',               url: `${T}/php/default.svg` },
-  { name: 'Node.js',           url: `${T}/nodejs/default.svg` },
-  { name: 'C++',               url: `${T}/cplusplus/default.svg` },
-  { name: 'C#',                url: `${T}/csharp/default.svg` },
-  { name: 'React',             url: `${T}/react/default.svg` },
-  { name: 'Vue.js',            url: `${T}/vue/default.svg` },
-  { name: 'Unity',             url: `${T}/unity/default.svg` },
-  { name: 'Salesforce',        url: `${T}/salesforce/default.svg` },
+  { name: 'JavaScript',        url: `${D}/javascript/javascript-original.svg` },
+  { name: 'Python',            url: `${D}/python/python-original.svg` },
+  { name: 'Java',              url: `${D}/java/java-original.svg` },
+  { name: 'HTML',              url: `${D}/html5/html5-original.svg` },
+  { name: 'CSS',               url: `${D}/css3/css3-original.svg` },
+  { name: 'PHP',               url: `${D}/php/php-original.svg` },
+  { name: 'Node.js',           url: `${D}/nodejs/nodejs-original.svg` },
+  { name: 'C++',               url: `${D}/cplusplus/cplusplus-original.svg` },
+  { name: 'C#',                url: `${D}/csharp/csharp-original.svg` },
+  { name: 'React',             url: `${D}/react/react-original.svg` },
+  { name: 'Vue.js',            url: `${D}/vuejs/vuejs-original.svg` },
+  { name: 'Unity',             url: `${D}/unity/unity-original.svg` },
+  { name: 'Salesforce',        url: `${D}/salesforce/salesforce-original.svg` },
 ];
 
 const ROW2: { name: string; url: string }[] = [
-  { name: 'Jira',              url: `${T}/jira/default.svg` },
-  { name: 'Git',               url: `${T}/git/default.svg` },
-  { name: 'Unity',             url: `${T}/unity/default.svg` },
-  { name: 'CodeIgniter',       url: `${T}/codeigniter/default.svg` },
-  { name: 'Figma',             url: `${T}/figma/default.svg` },
-  { name: 'Adobe Illustrator', url: `${T}/illustrator/default.svg` },
-  { name: 'Adobe Photoshop',   url: `${T}/photoshop/default.svg` },
-  { name: 'Adobe Premiere',    url: `${T}/premiere/default.svg` },
-  { name: 'MySQL',             url: `${T}/mysql/default.svg` },
-  { name: 'PostgreSQL',        url: `${T}/postgresql/default.svg` },
-  { name: 'SQLite',            url: `${T}/sqlite/default.svg` },
-  { name: 'JavaScript',        url: `${T}/javascript/default.svg` },
-  { name: 'React',             url: `${T}/react/default.svg` },
-  { name: 'Git',               url: `${T}/git/default.svg` },
+  { name: 'Jira',              url: `${D}/jira/jira-original.svg` },
+  { name: 'Git',               url: `${D}/git/git-original.svg` },
+  { name: 'Laravel',           url: `${D}/laravel/laravel-original.svg` },
+  { name: 'Figma',             url: `${D}/figma/figma-original.svg` },
+  { name: 'Adobe Illustrator', url: `${D}/illustrator/illustrator-plain.svg` },
+  { name: 'Adobe Photoshop',   url: `${D}/photoshop/photoshop-original.svg` },
+  { name: 'Adobe Premiere',    url: `${D}/premierepro/premierepro-original.svg` },
+  { name: 'MySQL',             url: `${D}/mysql/mysql-original.svg` },
+  { name: 'PostgreSQL',        url: `${D}/postgresql/postgresql-original.svg` },
+  { name: 'SQLite',            url: `${D}/sqlite/sqlite-original.svg` },
+  { name: 'JavaScript',        url: `${D}/javascript/javascript-original.svg` },
+  { name: 'React',             url: `${D}/react/react-original.svg` },
+  { name: 'Git',               url: `${D}/git/git-original.svg` },
+  { name: 'Salesforce',        url: `${D}/salesforce/salesforce-original.svg` },
 ];
 
 /* Icon tile — img with white filter */
