@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import GithubContributions from './GithubContributions';
 
 /* ── Windows CMD terminal ── */
 
@@ -159,6 +160,9 @@ export default function AboutSection() {
               Outside of IDE, I recharge through physical activities and travel, which help me refresh my mind and gain new perspectives.
               I also enjoy graphic design, drawing, and brainstorming ideas for potential projects. These creative pursuits allow me to continuously learn, explore, and bring fresh ideas into both my professional and personal life.
             </p>
+
+            {/* GitHub Contributions Activity */}
+            <GithubContributions />
           </motion.div>
         </div>
       </div>
