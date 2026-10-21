@@ -1,24 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-
-const stats = [
-  { value: '50+', label: 'Projects Completed' },
-  { value: '30+', label: 'Clients Supported' },
-  { value: '5+',  label: 'Years Experience' },
-  { value: '25+', label: 'Technologies' },
-];
-
-const highlights = [
-  'Modern full-stack frameworks',
-  'Cloud-native & DevOps practices',
-  'AI/ML integration specialist',
-  'Scalable microservices architecture',
-  'Performance optimization & SEO',
-  'Agile cross-functional leadership',
-];
 
 /* ── Windows CMD terminal ── */
 
@@ -172,30 +155,10 @@ export default function AboutSection() {
             <p className="text-body-xl-new" style={{ color: 'var(--color-text-secondary)', marginBottom: 20, lineHeight: 1.6 }}>
               I&apos;m <strong style={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>John Emman Lanusga</strong>, a graduate of Ateneo de Naga University with a Bachelor of Science in Information Technology. I am a Philippine-based <strong style={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>Developer</strong> with a passion for building reliable software. In my role, I bridge the gap between technical execution and business value, helping ensure that every release is delivered with confidence and quality.
             </p>
-            <p className="text-body-lg-new" style={{ color: 'var(--color-text-faint)', marginBottom: 32, lineHeight: 1.7 }}>
-              Outside of IDE, I recharge through physical activities and travel, which help me refresh my mind and gain new perspectives. 
+            <p className="text-body-lg-new" style={{ color: 'var(--color-text-faint)', marginBottom: 0, lineHeight: 1.7 }}>
+              Outside of IDE, I recharge through physical activities and travel, which help me refresh my mind and gain new perspectives.
               I also enjoy graphic design, drawing, and brainstorming ideas for potential projects. These creative pursuits allow me to continuously learn, explore, and bring fresh ideas into both my professional and personal life.
             </p>
-
-            {/* Highlight list */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 24px', marginBottom: 40 }}>
-              {highlights.map(h => (
-                <div key={h} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--color-text-faint)' }}>
-                  <Check size={13} color="var(--color-purple-400)" strokeWidth={2.5} />
-                  {h}
-                </div>
-              ))}
-            </div>
-
-            {/* Stats */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 1, background: 'var(--color-border)' }}>
-              {stats.map(s => (
-                <div key={s.label} style={{ background: 'var(--color-surface)', padding: '20px 16px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: 4 }}>{s.value}</div>
-                  <div style={{ fontSize: 12, color: 'var(--color-text-faint)', lineHeight: 1.4 }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
           </motion.div>
         </div>
       </div>
