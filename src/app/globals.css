@@ -568,3 +568,28 @@ main > section, main > footer { background-color: transparent !important; }
 .ipod-hit:active:not(:disabled) { background: rgba(0,0,0,.10) !important; }
 .ipod-hit:focus-visible { outline: 2px solid var(--color-purple-500); outline-offset: 2px; }
 .ipod-hit:disabled { cursor: default; }
+
+/* Spotify button — same shape as the primary button, Spotify green */
+.btn-spotify {
+  position: relative; z-index: 1;
+  display: inline-flex; align-items: center; gap: 10px;
+  overflow: hidden;
+  height: 48px; padding: 0 24px;
+  background: #1DB954;
+  color: #04140a;
+  font-size: 15px; font-weight: 600;
+  white-space: nowrap; text-decoration: none;
+  border: none; cursor: pointer;
+  transition: color var(--global-transition);
+}
+.btn-spotify::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0;
+  background: #0f7a35;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--global-transition);
+}
+.btn-spotify:hover::before { transform: scaleX(1); transform-origin: left; }
+.btn-spotify:hover { color: #fff; }
+.btn-spotify > * { position: relative; z-index: 1; }
