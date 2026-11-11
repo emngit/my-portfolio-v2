@@ -32,6 +32,8 @@ interface Project {
   statusColor: string;
   metric: string;
   bannerType?: 'kairos' | 'kada-tipon';
+  githubUrl?: string;
+  demoUrl?: string;
 }
 
 const projects: Project[] = [
@@ -43,6 +45,7 @@ const projects: Project[] = [
     statusColor: 'var(--color-purple-400)',
     metric: 'AI-powered',
     bannerType: 'kairos',
+    githubUrl: 'https://github.com/emngit/Jira-Assistant',
   },
   {
     name: 'Kada Tipon Game',
@@ -52,6 +55,7 @@ const projects: Project[] = [
     statusColor: 'var(--color-green-400)',
     metric: 'EdTech Game',
     bannerType: 'kada-tipon',
+    githubUrl: 'https://github.com/emngit/Kada-Tipon-Game',
   },
   {
     name: 'SewIt – Tailor Shop Management System',
@@ -60,6 +64,7 @@ const projects: Project[] = [
     status: 'Capstone',
     statusColor: '#ecd60e',
     metric: 'Full-stack',
+    githubUrl: 'https://github.com/emngit/Capstone-Project-Sew-It',
   },
 ];
 
@@ -225,12 +230,39 @@ export default function ProjectsSection() {
 
                 {/* Actions */}
                 <div style={{ display: 'flex', gap: 20, paddingTop: 12, borderTop: '1px solid var(--color-border)' }}>
-                  <button style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--color-gray-400)', background: 'none', border: 'none', cursor: 'pointer' }}>
-                    <ExternalLink size={12} /> Live Demo
-                  </button>
-                  <button style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--color-gray-400)', background: 'none', border: 'none', cursor: 'pointer', marginLeft: 'auto' }}>
-                    <GitFork size={12} /> GitHub
-                  </button>
+                  {p.demoUrl ? (
+                    <a
+                      href={p.demoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--color-gray-400)', textDecoration: 'none', transition: 'color .2s' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-purple-400)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-gray-400)')}
+                    >
+                      <ExternalLink size={12} /> Live Demo
+                    </a>
+                  ) : (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--color-gray-600)', cursor: 'default' }}>
+                      <ExternalLink size={12} /> Live Demo
+                    </span>
+                  )}
+
+                  {p.githubUrl ? (
+                    <a
+                      href={p.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--color-gray-400)', textDecoration: 'none', marginLeft: 'auto', transition: 'color .2s' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-purple-400)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-gray-400)')}
+                    >
+                      <GitFork size={12} /> GitHub
+                    </a>
+                  ) : (
+                    <button style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--color-gray-400)', background: 'none', border: 'none', cursor: 'pointer', marginLeft: 'auto' }}>
+                      <GitFork size={12} /> GitHub
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>
