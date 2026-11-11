@@ -458,6 +458,12 @@ body {
    ───────────────────────────────────────────── */
 .rg-exp-timeline { padding-right: 0; }
 .rg-player-line { display: none; }
+.rg-ticker-dup { display: none; }
+
+@keyframes rg-ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
 
 @media (min-width: 1024px) {
   .rg-exp-timeline { padding-right: calc(390px + 48px); }
@@ -515,6 +521,14 @@ body {
   .rg-music-card > div:first-child > div:last-child { display: none !important; }
   .rg-player-extra { display: none !important; }
   .rg-player-line  { display: block !important; }
+  /* keep the centre/right controls at natural size so the title gets the remaining width */
+  .rg-player-mid   { flex: 0 0 auto !important; }
+  .rg-player-right { flex: 0 0 auto !important; }
+  /* scrolling title, like a news ticker */
+  .rg-ticker       { text-overflow: clip !important; }
+  .rg-ticker-track { display: inline-flex; width: max-content; will-change: transform; animation: rg-ticker 10s linear infinite; }
+  .rg-ticker-track > span { padding-right: 32px; }
+  .rg-ticker-dup   { display: inline !important; }
 
 
   .rg-marquee { flex-direction: column !important; align-items: stretch !important; gap: 28px !important; padding: 40px 0 !important; }

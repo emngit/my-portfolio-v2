@@ -424,12 +424,17 @@ export default function MusicSection() {
               )}
             </div>
             <div style={{ minWidth: 0 }}>
-              <a href={current.url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{current.name}</a>
+              <a href={current.url} target="_blank" rel="noopener noreferrer" className="rg-ticker" style={{ display: 'block', fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span className="rg-ticker-track" key={current.uri}>
+                  <span>{current.name}</span>
+                  <span className="rg-ticker-dup" aria-hidden="true">{current.name}</span>
+                </span>
+              </a>
               <div style={{ fontSize: 12, color: 'var(--color-text-faint)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{current.artist}</div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: '0 1 460px', minWidth: 0 }}>
+          <div className="rg-player-mid" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: '0 1 460px', minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
               <button type="button" className="rg-player-extra" onClick={() => step(-1)} disabled={!canStep} aria-label="Previous track"
                 style={{ background: 'none', border: 'none', color: 'var(--color-text-secondary)', opacity: canStep ? 1 : 0.35, display: 'flex' }}><PrevIcon /></button>
@@ -449,7 +454,7 @@ export default function MusicSection() {
             </div>
           </div>
 
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
+          <div className="rg-player-right" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
             <button type="button" onClick={() => setLyricsOpen((v) => !v)} aria-label="Lyrics" aria-pressed={lyricsOpen} title="Lyrics"
               style={{ height: 36, padding: '0 12px', border: 'none', background: 'transparent', color: lyricsOpen ? GREEN : 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 500 }}>
               <LyricsIcon />
