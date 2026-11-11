@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const W = 560;
 const H = 230;
@@ -152,18 +153,24 @@ function playSound(kind: Sfx) {
   if (!AC) return;
   audioCtx ??= new AC();
   const ac = audioCtx;
-  if (ac.state === 'suspended') void ac.resume();
-  switch (kind) {
-    case 'jump':      tone(ac, 'square', 330, 760, 0, 0.16, 0.06); break;
-    case 'start':     tone(ac, 'square', 440, 660, 0, 0.08, 0.05); tone(ac, 'square', 660, 880, 0.08, 0.1, 0.05); break;
-    case 'milestone': tone(ac, 'square', 880, 880, 0, 0.07, 0.05); tone(ac, 'square', 1175, 1175, 0.1, 0.12, 0.05); break;
-    case 'die':       tone(ac, 'sawtooth', 300, 50, 0, 0.45, 0.09); tone(ac, 'square', 120, 40, 0, 0.3, 0.06); break;
-  }
+  const play = () => {
+    switch (kind) {
+      case 'jump':      tone(ac, 'square', 280, 900, 0, 0.18, 0.14); tone(ac, 'triangle', 560, 1800, 0, 0.18, 0.1); break;
+      case 'start':     tone(ac, 'square', 440, 660, 0, 0.08, 0.1); tone(ac, 'square', 660, 880, 0.08, 0.1, 0.1); break;
+      case 'milestone': tone(ac, 'square', 880, 880, 0, 0.07, 0.1); tone(ac, 'square', 1175, 1175, 0.1, 0.12, 0.1); break;
+      case 'die':       tone(ac, 'sawtooth', 300, 50, 0, 0.45, 0.15); tone(ac, 'square', 120, 40, 0, 0.3, 0.1); break;
+    }
+  };
+  // A suspended context has a frozen clock — schedule only once it is actually running.
+  if (ac.state === 'running') play();
+  else void ac.resume().then(play);
 }
 
 /* ── component ── */
 export default function DinoGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const bigRef = useRef<HTMLCanvasElement>(null);
+  const [expanded, setExpanded] = useState(false);
 
   /* preload all sprites once into a stable ref */
   const imgs = useRef<{
@@ -318,9 +325,9 @@ export default function DinoGame() {
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(0, GROUND_Y + 2); ctx.lineTo(W, GROUND_Y + 2); ctx.stroke();
 
-      /* ground pebbles — only scroll when not dead */
+      /* ground pebbles — scroll at exactly the obstacle speed (px per frame) so the floor and buildings stay in sync */
       ctx.fillStyle = isDark ? '#2a2a4a' : '#aaa';
-      if (s.state !== 'dead') s.pebbleOff = (Date.now() / 6) % 55;
+      if (s.state !== 'dead') s.pebbleOff = (s.pebbleOff + s.speed) % 55;
       for (let x = -s.pebbleOff; x < W; x += 55) {
         ctx.fillRect(x,      GROUND_Y + 6,  3, 2);
         ctx.fillRect(x + 28, GROUND_Y + 11, 2, 2);
@@ -474,6 +481,22 @@ export default function DinoGame() {
     return () => { io.disconnect(); gameOnScreen = false; };
   }, []);
 
+  /* expanded view: mirror the live canvas every frame, and close on Esc */
+  useEffect(() => {
+    if (!expanded) return;
+    let raf = 0;
+    const mirror = () => {
+      const src = canvasRef.current;
+      const ctx = bigRef.current?.getContext('2d');
+      if (src && ctx) ctx.drawImage(src, 0, 0);
+      raf = requestAnimationFrame(mirror);
+    };
+    raf = requestAnimationFrame(mirror);
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setExpanded(false); };
+    window.addEventListener('keydown', onKey);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('keydown', onKey); };
+  }, [expanded]);
+
   /* ── keyboard ── */
   useEffect(() => {
     const kd = (e: KeyboardEvent) => {
@@ -502,9 +525,19 @@ export default function DinoGame() {
           </svg>
           <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)' }}>app-backend</span>
         </div>
-        <span style={{ fontSize: 11, color: 'var(--color-purple-400)', display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span className="animate-blink">↻</span> Playing
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 11, color: 'var(--color-purple-400)', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span className="animate-blink">↻</span> Playing
+          </span>
+          <button
+            type="button" onClick={(e) => { e.currentTarget.blur(); setExpanded(true); }} aria-label="Expand game" title="Expand"
+            style={{ display: 'grid', placeItems: 'center', width: 22, height: 22, background: 'none', border: '1px solid var(--color-border)', color: 'var(--color-gray-500)' }}
+          >
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4">
+              <path d="M7 1h4v4M5 11H1V7M11 1L7 5M1 11l4-4" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <canvas
@@ -526,6 +559,42 @@ export default function DinoGame() {
       <div style={{ fontSize: 10, color: 'var(--color-gray-500)', textAlign: 'center', letterSpacing: '.06em', marginTop: 8 }}>
         SPACE / ↑ = JUMP &nbsp;·&nbsp; ↓ = DUCK &nbsp;·&nbsp; TAP = JUMP
       </div>
+
+      {/* Semi full-screen view — same overlay style as the lyrics / typing test. Mirrors the live game canvas. */}
+      {expanded && createPortal(
+        <div
+          role="dialog" aria-modal="true" aria-label="Endless runner"
+          style={{
+            position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            padding: '24px 6.25%', overflowY: 'auto',
+            background: 'color-mix(in srgb, var(--color-background) 80%, transparent)',
+            backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)',
+          }}
+        >
+          <button
+            type="button" onClick={() => setExpanded(false)} aria-label="Close game" className="btn-render-secondary"
+            style={{ position: 'absolute', top: 20, right: '6.25%', height: 36, padding: '0 14px', fontSize: 13 }}
+          >
+            <span>Close</span>
+          </button>
+          <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--color-purple-400)', marginBottom: 24 }}>
+            Endless runner
+          </p>
+          <canvas
+            ref={bigRef} width={W} height={H} onClick={jump}
+            style={{
+              width: '100%', maxWidth: 'min(1100px, calc((100vh - 220px) * 560 / 230))', height: 'auto', display: 'block',
+              imageRendering: 'pixelated', cursor: 'pointer', touchAction: 'manipulation', border: '1px solid var(--color-border)',
+            }}
+          />
+          <div style={{ marginTop: 28, fontSize: 12, color: 'var(--color-gray-500)', letterSpacing: '.04em' }}>
+            <span style={{ fontSize: 11, padding: '2px 6px', border: '1px solid var(--color-border)', marginRight: 6 }}>space</span>jump
+            <span style={{ fontSize: 11, padding: '2px 6px', border: '1px solid var(--color-border)', margin: '0 6px 0 20px' }}>↓</span>duck
+            <span style={{ fontSize: 11, padding: '2px 6px', border: '1px solid var(--color-border)', margin: '0 6px 0 20px' }}>esc</span>close
+          </div>
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }
