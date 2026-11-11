@@ -197,7 +197,7 @@ export default function Navbar() {
               <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 10, letterSpacing: '0.01em' }}>Resume</span>
             </button>
             <button className="btn-render-primary" onClick={() => go('#contact')} style={{ height: 42, fontSize: 15, padding: '0 22px' }}>
-              <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 10, letterSpacing: '0.01em' }}>Hire Me</span>
+              <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 10, letterSpacing: '0.01em' }}>Let's Talk...</span>
             </button>
           </div>
 
