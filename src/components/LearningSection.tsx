@@ -66,11 +66,13 @@ const ACTIVE_FG = '#3dea72';
 
 export default function LearningSection() {
   const [activeId, setActiveId] = useState('all');
+  const [expanded, setExpanded] = useState(false);
 
   const tabs = [{ id: 'all', label: 'All badges' }, ...CATEGORIES];
   const countOf = (id: string) => (id === 'all' ? BADGES.length : BADGES.filter((b) => b.category === id).length);
   const activeLabel = tabs.find((t) => t.id === activeId)?.label ?? 'All badges';
   const rows = activeId === 'all' ? BADGES : BADGES.filter((b) => b.category === activeId);
+  const visibleRows = expanded ? rows : rows.slice(0, 5);
 
   return (
     <section id="learning" className="bg-grid section-border-b" style={{ background: 'var(--color-background)', padding: '96px 0' }}>
@@ -98,7 +100,10 @@ export default function LearningSection() {
                   type="button"
                   role="tab"
                   aria-selected={isActive}
-                  onClick={() => setActiveId(t.id)}
+                  onClick={() => {
+                    setActiveId(t.id);
+                    setExpanded(false);
+                  }}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
                     textAlign: 'left',
@@ -125,7 +130,7 @@ export default function LearningSection() {
             </h3>
 
             <ul key={activeId} style={{ listStyle: 'none' }}>
-              {rows.map((b) => (
+              {visibleRows.map((b) => (
                 <li
                   key={b.id}
                   className="rg-learn-row"
@@ -147,6 +152,44 @@ export default function LearningSection() {
                 </li>
               ))}
             </ul>
+
+            {rows.length > 5 && (
+              <div style={{ marginTop: 24 }}>
+                <button
+                  type="button"
+                  onClick={() => setExpanded((v) => !v)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    background: 'none',
+                    border: '1px solid var(--color-border)',
+                    padding: '10px 20px',
+                    borderRadius: 999,
+                    fontFamily: mono,
+                    fontSize: 12,
+                    letterSpacing: '.06em',
+                    textTransform: 'uppercase',
+                    color: 'var(--color-text-faint)',
+                    cursor: 'pointer',
+                    transition: 'color .2s, border-color .2s, background .2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'var(--color-text-primary)';
+                    e.currentTarget.style.borderColor = 'var(--color-purple-400)';
+                    e.currentTarget.style.background = 'rgba(138,5,255,0.06)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'var(--color-text-faint)';
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.background = 'none';
+                  }}
+                >
+                  <span>{expanded ? 'Hide' : 'See more...'}</span>
+                  <span style={{ fontSize: 10, transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}>▼</span>
+                </button>
+              </div>
+            )}
 
             <p style={{ fontFamily: mono, fontSize: 12, color: 'var(--color-gray-500)', marginTop: 24 }}>
               <a href={CREDLY_PROFILE} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-purple-400)', textDecoration: 'none' }}>All badges on Credly ↗</a>

@@ -140,7 +140,8 @@ export default function SafeSpace() {
         style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       >
         <h1 style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
-          Safe Space
+          Safe Space..
+          Coming Soon... IG XD
         </h1>
       </motion.div>
     </main>
