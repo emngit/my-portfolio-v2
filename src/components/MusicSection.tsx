@@ -3,7 +3,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const PROFILE_URL = 'https://open.spotify.com/user/rtoidubftyvjz4zvgojf3lj44';
 const GREEN = '#1DB954';
 
 /* ── Spotify iFrame API (minimal typings) ── */
@@ -97,11 +96,6 @@ const NextIcon = () => (
 const CloseIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
 );
-const SpotifyLogo = ({ size = 28 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
-    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.52 17.34c-.24.36-.66.48-1.02.24-2.82-1.74-6.36-2.1-10.56-1.14-.42.12-.78-.18-.9-.54-.12-.42.18-.78.54-.9 4.56-1.02 8.52-.6 11.64 1.32.42.18.48.66.3 1.02zm1.44-3.3c-.3.42-.84.6-1.26.3-3.24-1.98-8.16-2.58-11.94-1.38-.48.12-.99-.12-1.14-.6-.12-.48.12-.99.6-1.14 4.38-1.32 9.78-.66 13.5 1.62.36.18.54.78.24 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.3c-.6.18-1.2-.18-1.38-.72-.18-.6.18-1.2.72-1.38 4.26-1.26 11.28-1.02 15.72 1.62.54.3.72 1.02.42 1.56-.3.42-1.02.6-1.56.3z" />
-  </svg>
-);
 const LyricsIcon = () => (
   <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.426 2.574a2.831 2.831 0 0 0-4.797 1.55l3.247 3.247a2.831 2.831 0 0 0 1.55-4.797zM10.5 8.118l-2.619-2.62A63303.13 63303.13 0 0 0 4.74 9.075L2.065 12.12a1.287 1.287 0 0 0 1.816 1.816l3.06-2.688 3.56-3.129zM7.12 4.094a4.331 4.331 0 1 1 4.786 4.786l-3.974 3.493-3.06 2.689a2.787 2.787 0 0 1-3.933-3.933l2.676-3.045 3.505-3.99z" /></svg>
 );
@@ -145,6 +139,15 @@ async function fetchLyrics(meta: Meta): Promise<LyricsData> {
 
 
 
+/* Transparent hot spot laid over a part of the iPod's click wheel (left/top/width/height are % of the iPod image). */
+function WheelHit({ label, left, top, width, height, onClick, disabled = false }: {
+  label: string; left: string; top: string; width: string; height: string; onClick: () => void; disabled?: boolean;
+}) {
+  return (
+    <button type="button" aria-label={label} title={label} onClick={onClick} disabled={disabled} className="ipod-hit"
+      style={{ position: 'absolute', left, top, width, height, zIndex: 2, background: 'transparent', border: 'none', padding: 0 }} />
+  );
+}
 const mono = "'Consolas','Courier New',monospace";
 
 export default function MusicSection() {
@@ -308,6 +311,7 @@ export default function MusicSection() {
   const progress = playback.duration > 0 ? (playback.position / playback.duration) * 100 : 0;
   const canStep = tracks.length > 1 && !custom;
 
+
   return (
     <>
       <section id="music" className="bg-grid section-border-b" style={{ background: 'var(--color-background)', padding: '96px 0' }}>
@@ -324,55 +328,61 @@ export default function MusicSection() {
 
             {/* Left — player card + paste-a-link */}
             <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} style={{ minWidth: 0 }}>
-              <div className="rg-music-card" style={{ background: '#1f5582', borderRadius: 14, padding: 28, color: '#fff' }}>
-                <div style={{ display: 'flex', gap: 24, alignItems: 'center', position: 'relative' }}>
-                  <div style={{ width: 150, height: 150, flexShrink: 0, background: 'rgba(0,0,0,.25)', borderRadius: 4, overflow: 'hidden' }}>
-                    {current?.image && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={current.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                    )}
-                  </div>
-                  <div style={{ minWidth: 0, flex: 1 }}>
-                    <div style={{ fontSize: 22, fontWeight: 700, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                      {current ? current.name : 'Nothing queued'}
-                    </div>
-                    <div style={{ fontSize: 15, color: '#9fd0ff', marginTop: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {current ? current.artist : 'Paste a Spotify link below to play something'}
-                    </div>
-                    <a href={current?.url ?? PROFILE_URL} target="_blank" rel="noopener noreferrer"
-                       style={{ display: 'inline-block', marginTop: 14, fontSize: 13, fontWeight: 600, color: '#fff', textDecoration: 'none' }}>
-                      {current ? 'Open in Spotify ↗' : 'Spotify profile ↗'}
-                    </a>
-                  </div>
-                  <div style={{ position: 'absolute', top: 0, right: 0 }}><SpotifyLogo /></div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 24 }}>
-                  <div onClick={seek} style={{ flex: 1, height: 4, background: 'rgba(0,0,0,.35)', borderRadius: 2, position: 'relative', cursor: 'pointer' }}>
-                    <div style={{ width: `${progress}%`, height: '100%', background: '#fff', borderRadius: 2 }} />
-                  </div>
-                  <span style={{ fontSize: 13, fontVariantNumeric: 'tabular-nums' }}>
-                    {playback.duration > 0 ? `-${fmt(playback.duration - playback.position)}` : '--:--'}
-                  </span>
-                  <button type="button" onClick={togglePlay} disabled={!current} aria-label={playing ? 'Pause' : 'Play'}
-                    style={{ width: 44, height: 44, borderRadius: '50%', border: 'none', background: '#fff', color: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: current ? 1 : 0.5 }}>
-                    {playing ? <PauseIcon size={20} /> : <PlayIcon size={20} />}
-                  </button>
-                </div>
-              </div>
-
-              <form onSubmit={submitLink} style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+              <form onSubmit={submitLink} style={{ display: 'flex', gap: 12, maxWidth: 360, margin: '0 auto 20px' }}>
                 <input
                   value={link}
                   onChange={(e) => setLink(e.target.value)}
-                  placeholder="Paste any Spotify song, album or playlist link"
+                  placeholder="Paste a Spotify link"
                   aria-label="Spotify link"
                   className="input-field"
                   style={{ borderRadius: 999, padding: '.8rem 1.2rem', minWidth: 0 }}
                 />
                 <button type="submit" className="btn-render-primary" style={{ borderRadius: 999, flexShrink: 0 }}><span>Play</span></button>
               </form>
-              {linkError && <p style={{ fontSize: 12, color: '#ff6b6b', marginTop: 8 }}>{linkError}</p>}
+              {linkError && <p style={{ fontSize: 12, color: '#ff6b6b', maxWidth: 360, margin: '-8px auto 16px' }}>{linkError}</p>}
+
+              {/* iPod — the PNG has a transparent screen window, so the "screen" sits underneath it */}
+              <div style={{ position: 'relative', width: '100%', maxWidth: 360, aspectRatio: '1200 / 1975', margin: '0 auto', containerType: 'inline-size', filter: 'drop-shadow(0 24px 36px rgba(0,0,0,.32))' }}>
+                <div style={{ position: 'absolute', left: '8.08%', top: '4.96%', width: '83.9%', height: '38.3%', background: '#fff', color: '#111', display: 'flex', flexDirection: 'column', overflow: 'hidden', fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
+                  <div style={{ height: '15%', flexShrink: 0, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(#f4f7fb, #b4c0d4)', borderBottom: '1px solid #8793a8', fontSize: '4.4cqw', fontWeight: 700, color: '#222' }}>
+                    <span style={{ position: 'absolute', left: '3cqw', fontSize: '3.2cqw', color: '#2a6fd6' }}>{playing ? '▶' : '❚❚'}</span>
+                    Now Playing
+                  </div>
+                  <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', gap: '3.5cqw', padding: '0 3.5cqw' }}>
+                    <div style={{ width: '29cqw', height: '29cqw', flexShrink: 0, background: '#d8dde6', boxShadow: '0 1px 4px rgba(0,0,0,.4)', overflow: 'hidden' }}>
+                      {current?.image && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={current.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      )}
+                    </div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontSize: '4.8cqw', fontWeight: 700, lineHeight: 1.2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>{current.name}</div>
+                      <div style={{ fontSize: '4cqw', color: '#3d4d69', marginTop: '1.2cqw', lineHeight: 1.2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{current.artist}</div>
+                    </div>
+                  </div>
+                  <div style={{ flexShrink: 0, padding: '0 3.5cqw 2.5cqw' }}>
+                    <div onClick={seek} style={{ height: '5cqw', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                      <div style={{ width: '100%', height: '2.6cqw', border: '1px solid #7d8ba3', borderRadius: 2, background: 'linear-gradient(#dfe4ec, #f6f8fb)', overflow: 'hidden' }}>
+                        <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(#5ea2f5, #1f63c6)' }} />
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '3.4cqw', fontWeight: 600, color: '#333', fontVariantNumeric: 'tabular-nums' }}>
+                      <span>{fmt(playback.position)}</span>
+                      <span>{playback.duration > 0 ? `-${fmt(playback.duration - playback.position)}` : '--:--'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/ipod.png" alt="iPod" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block', pointerEvents: 'none', userSelect: 'none', zIndex: 1 }} />
+
+                {/* click-wheel hot spots */}
+                <WheelHit label="Previous track" left="19.3%" top="69.25%" width="11.7%" height="7.1%" onClick={() => step(-1)} disabled={!canStep} />
+                <WheelHit label="Next track" left="66%" top="69.25%" width="11.7%" height="7.1%" onClick={() => step(1)} disabled={!canStep} />
+                <WheelHit label={playing ? 'Pause' : 'Play'} left="42.65%" top="83.4%" width="11.7%" height="7.1%" onClick={togglePlay} />
+                <WheelHit label={playing ? 'Pause' : 'Play'} left="39.15%" top="67.1%" width="18.7%" height="11.3%" onClick={togglePlay} />
+              </div>
+
             </motion.div>
 
             {/* Right — favourites */}

@@ -562,3 +562,9 @@ main > section, main > footer { background-color: transparent !important; }
 ::view-transition-group(sword) { animation: none; z-index: 3; }
 ::view-transition-old(sword),
 ::view-transition-new(sword) { animation: none; mix-blend-mode: normal; }
+
+/* iPod click-wheel hot spots */
+.ipod-hit { border-radius: 50%; -webkit-tap-highlight-color: transparent; }
+.ipod-hit:active:not(:disabled) { background: rgba(0,0,0,.10) !important; }
+.ipod-hit:focus-visible { outline: 2px solid var(--color-purple-500); outline-offset: 2px; }
+.ipod-hit:disabled { cursor: default; }
