@@ -166,20 +166,20 @@ export default function ExperienceSection() {
         </motion.div>
 
         {/* Timeline — reserve right margin so fixed portal doesn't overlap */}
-        <div style={{ position: 'relative', paddingRight: 'calc(390px + 48px)' }} className="hidden-portal-spacer">
+        <div style={{ position: 'relative' }} className="rg-exp-timeline">
           <div style={{ position: 'relative' }}>
             {/* Vertical line */}
             <div className="tl-line" style={{ position: 'absolute', left: 19, top: 0, width: 1, height: '100%' }} />
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             {experiences.map((exp, i) => (
-              <motion.div key={exp.company} initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }} style={{ position: 'relative', paddingLeft: 56 }}>
+              <motion.div key={exp.role} className="rg-exp-item" initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }} style={{ position: 'relative', paddingLeft: 56 }}>
 
                 {/* Dot */}
                 <div style={{ position: 'absolute', left: 12, top: 20, width: 14, height: 14, borderRadius: '50%', background: exp.color, border: '2px solid var(--color-background)', boxShadow: `0 0 0 3px ${exp.color}40` }} />
 
                 {/* Card */}
-                <div className="card-hover" style={{ background: 'var(--color-surface-raised)', padding: '24px 28px' }}>
+                <div className="card-hover rg-exp-card" style={{ background: 'var(--color-surface-raised)', padding: '24px 28px' }}>
                   {/* Header */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
                     <div>
@@ -189,7 +189,7 @@ export default function ExperienceSection() {
                         <span style={{ fontSize: 11, padding: '2px 7px', background: `${exp.color}15`, color: exp.color, border: `1px solid ${exp.color}30` }}>{exp.type}</span>
                       </div>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
+                    <div className="rg-exp-meta" style={{ textAlign: 'right' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--color-gray-500)', marginBottom: 4, justifyContent: 'flex-end' }}>
                         <Calendar size={11} /> {exp.duration}
                       </div>

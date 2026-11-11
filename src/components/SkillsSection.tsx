@@ -140,7 +140,7 @@ export default function SkillsSection() {
         </motion.div>
 
         {/* Progress bar grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 1, background: 'var(--color-border)', marginBottom: 48 }}>
+        <div className="rg-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 1, background: 'var(--color-border)', marginBottom: 48 }}>
           {groups.map((g, gi) => (
             <motion.div
               key={g.category}
@@ -179,6 +179,8 @@ export default function SkillsSection() {
       <motion.div
         initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.15 }}
+        className="rg-marquee"
+
         style={{
           width: '100%',
           background: 'var(--color-purple-700)',
@@ -191,6 +193,8 @@ export default function SkillsSection() {
       >
         {/* Left label panel — face logo top, wordmark logo bottom */}
         <div
+          className="rg-marquee-label"
+
           style={{
             flexShrink: 0,
             width: 'clamp(200px, 22vw, 320px)',

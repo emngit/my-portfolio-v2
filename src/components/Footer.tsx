@@ -29,16 +29,26 @@ export default function Footer() {
       <div style={{ width: '100%', padding: '0 6.25%' }}>
 
         {/* Top row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
+        <div className="rg-footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
 
           {/* Brand */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <div style={{ width: 28, height: 28, background: 'var(--color-purple-600)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#fff' }}>JD</div>
-              <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-text-primary)' }}>JohnDev<span style={{ color: 'var(--color-purple-400)' }}>.</span></span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 20 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/kwon-hyuk.jpg"
+                alt="BastaEmmani"
+                width={96}
+                height={96}
+                style={{ width: 96, height: 96, flexShrink: 0, borderRadius: '50%', objectFit: 'cover', objectPosition: '50% 24%', boxShadow: '0 4px 60px rgba(0,0,0,.5)' }}
+              />
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 2 }}>Profile</div>
+                <div style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em', color: 'var(--color-text-primary)', overflowWrap: 'anywhere' }}>BastaEmmani</div>
+              </div>
             </div>
             <p style={{ fontSize: 13, color: 'var(--color-text-faint)', lineHeight: 1.7, maxWidth: 320 }}>
-              Full Stack Engineer building enterprise-grade products that scale. Open to exciting opportunities worldwide.
+              Application Developer building enterprise-grade products that scale. Open to exciting opportunities worldwide.
             </p>
             {/* Availability chip */}
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, marginTop: 16, fontSize: 12, color: 'var(--color-green-400)', background: 'rgba(0,219,124,0.07)', border: '1px solid rgba(0,219,124,0.18)', padding: '4px 12px' }}>
@@ -64,11 +74,11 @@ export default function Footer() {
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--color-gray-500)', marginBottom: 16 }}>Connect</p>
             <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
               {[
-                { icon: <GithubIcon />, label: 'GitHub',   href: '#' },
-                { icon: <LinkedInIcon />, label: 'LinkedIn', href: '#' },
-                { icon: <Mail size={15} />, label: 'Email',  href: 'mailto:john@example.com' },
+                { icon: <GithubIcon />, label: 'GitHub',   href: 'https://github.com/emngit' },
+                { icon: <LinkedInIcon />, label: 'LinkedIn', href: 'https://www.linkedin.com/in/jelanusga/' },
+                { icon: <Mail size={15} />, label: 'Email',  href: 'mailto:emmanlanusga@gmail.com' },
               ].map(s => (
-                <a key={s.label} href={s.href} title={s.label} style={{ width: 34, height: 34, background: 'var(--color-surface)', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-faint)', textDecoration: 'none' }}>
+                <a key={s.label} href={s.href} title={s.label} target={s.href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer" style={{ width: 34, height: 34, background: 'var(--color-surface)', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-faint)', textDecoration: 'none' }}>
                   {s.icon}
                 </a>
               ))}
@@ -79,7 +89,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div style={{ paddingTop: 24, borderTop: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <p style={{ fontSize: 12, color: 'var(--color-gray-600)' }}>
-            © {new Date().getFullYear()} JohnDev. All rights reserved.
+            © {new Date().getFullYear()} BastaEmmani. All rights reserved.
           </p>
           <p style={{ fontSize: 12, color: 'var(--color-gray-700)' }}>
             Built with Next.js 15 · TypeScript · Tailwind · Framer Motion

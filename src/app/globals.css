@@ -105,24 +105,6 @@ body {
   font-family: 'PP Neue Montreal', -apple-system, "Segoe UI", system-ui, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  cursor: none;
-}
-
-/* ─── CURSOR (custom, not from Render) ─── */
-.cursor-dot  {
-  width: 7px; height: 7px;
-  background: var(--color-purple-400);
-  border-radius: 50%;
-  position: fixed; pointer-events: none; z-index: 99999;
-  transform: translate(-50%,-50%);
-}
-.cursor-ring {
-  width: 26px; height: 26px;
-  border: 1.5px solid rgba(170,119,253,.4);
-  border-radius: 50%;
-  position: fixed; pointer-events: none; z-index: 99998;
-  transform: translate(-50%,-50%);
-  transition: width .18s, height .18s, border-color .18s;
 }
 
 /* ─── GRID — exact Render column grid ─── */
@@ -302,6 +284,19 @@ body {
   background-clip: text;
 }
 
+/* Resource card header block: identical dark look in both themes (the JavaScript30 logo has white lettering). */
+.res-head {
+  background: var(--color-gray-800);
+  border-bottom-color: var(--color-gray-700) !important;
+  --color-bg-grid: var(--color-gray-700);
+}
+/* Light mode: a softer slate instead of near-black; still dark enough for the white JavaScript30 lettering. */
+[data-theme="light"] .res-head {
+  background: #3b3b46;
+  border-bottom-color: #4d4d58 !important;
+  --color-bg-grid: #4d4d58;
+}
+
 /* ─── CARD HOVER ─── */
 .card-hover {
   border: 1px solid var(--color-border);
@@ -457,3 +452,96 @@ body {
   .portal-img     { animation: none; filter: drop-shadow(0 0 28px rgba(74,222,128,0.50)); }
   .portal-canvas  { display: none; }
 }
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE — inline-styled layouts are overridden here
+   ───────────────────────────────────────────── */
+.rg-exp-timeline { padding-right: 0; }
+.rg-player-line { display: none; }
+
+@media (min-width: 1024px) {
+  .rg-exp-timeline { padding-right: calc(390px + 48px); }
+}
+
+@media (max-width: 1023px) {
+  .rg-hero-grid    { grid-template-columns: minmax(0, 1fr) !important; min-height: 0 !important; }
+  .rg-hero-left    { padding: 56px 0 24px !important; }
+  .rg-hero-right   { padding: 0 0 64px !important; }
+  .rg-hero-right > .rg-hero-deco { display: none !important; }
+  .rg-hero-right > div:not(.rg-hero-deco) { margin-top: 0 !important; }
+  .rg-about-grid   { grid-template-columns: minmax(0, 1fr) !important; gap: 48px !important; }
+  .rg-contact-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 40px !important; }
+  .rg-music-grid  { grid-template-columns: minmax(0, 1fr) !important; gap: 40px !important; }
+  .rg-learn-grid  { grid-template-columns: minmax(0, 1fr) !important; gap: 32px !important; }
+  .rg-learn-tabs  { flex-direction: row !important; flex-wrap: wrap; }
+
+  .rg-about-grid > *, .rg-contact-grid > * { min-width: 0; }
+  .rg-grid-3       { grid-template-columns: repeat(2, 1fr) !important; }
+  .rg-grid-4       { grid-template-columns: repeat(2, 1fr) !important; }
+  .rg-footer-grid  { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+  .rg-footer-grid > :first-child { grid-column: 1 / -1; }
+}
+
+@media (max-width: 640px) {
+  section[id]:not(#home) { padding-top: 64px !important; padding-bottom: 64px !important; }
+  .text-heading-lg-new,
+  .text-heading-xl-new { font-size: clamp(32px, 10vw, 44px); overflow-wrap: anywhere; }
+
+  .rg-hero-stats  { gap: 24px !important; flex-wrap: wrap; }
+  .rg-hero-scroll { display: none !important; }
+  .rg-hero-svc-grid { grid-template-columns: 1fr !important; }
+
+  .rg-grid-3,
+  .rg-grid-4      { grid-template-columns: 1fr !important; }
+  .rg-footer-grid { grid-template-columns: 1fr !important; }
+  .rg-form-grid   { grid-template-columns: 1fr !important; }
+
+  .rg-term-tab    { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .rg-term-ctrl   { display: none !important; }
+  .rg-term-body   { padding: 14px 12px !important; min-height: 0 !important; overflow-x: auto; }
+
+  .rg-exp-item    { padding-left: 40px !important; }
+  .rg-exp-card    { padding: 18px 16px !important; }
+  .rg-exp-meta    { text-align: left !important; }
+  .rg-exp-meta > div { justify-content: flex-start !important; }
+
+  .rg-card-pad    { padding: 24px 18px !important; }
+
+  .rg-learn-row   { flex-direction: column; align-items: flex-start !important; gap: 6px; }
+
+  .rg-music-card  { padding: 18px !important; }
+  .rg-music-card > div:first-child { gap: 16px !important; }
+  .rg-music-card > div:first-child > div:first-child { width: 88px !important; height: 88px !important; }
+  .rg-music-card > div:first-child > div:last-child { display: none !important; }
+  .rg-player-extra { display: none !important; }
+  .rg-player-line  { display: block !important; }
+
+
+  .rg-marquee { flex-direction: column !important; align-items: stretch !important; gap: 28px !important; padding: 40px 0 !important; }
+  .rg-marquee-label { width: 100% !important; padding: 0 6.25% !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: 28px !important; }
+  .rg-marquee-label img:first-child { width: 76px !important; aspect-ratio: 1212 / 1482; object-fit: contain; object-view-box: inset(11.56% 18.54% 11.25% 18.33%); }
+  .rg-marquee-label img:last-child  { width: 124px !important; aspect-ratio: 1176 / 666; object-fit: contain; object-view-box: inset(15.93% 17.92% 22.41% 20.83%); }
+}
+
+/* ─────────────────────────────────────────────
+   THEME SWITCH — sword slash (see src/lib/themeTransition.ts)
+   ───────────────────────────────────────────── */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
+
+.sword-slash {
+  position: fixed; left: 0; top: 0;
+  width: 3px;
+  pointer-events: none;
+  view-transition-name: sword;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 12%, #fff 88%, rgba(255,255,255,0) 100%);
+  box-shadow:
+    0 0 8px 2px #fff,
+    0 0 24px 8px rgba(170,119,253,.9),
+    0 0 64px 18px rgba(139,92,246,.45);
+}
+::view-transition-group(sword) { animation: none; z-index: 3; }
+::view-transition-old(sword),
+::view-transition-new(sword) { animation: none; mix-blend-mode: normal; }

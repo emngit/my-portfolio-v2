@@ -37,7 +37,7 @@ export default function ContactSection() {
           </h2>
         </motion.div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', gap: 48, alignItems: 'start' }}>
+        <div className="rg-contact-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', gap: 48, alignItems: 'start' }}>
 
           {/* Left info */}
           <motion.div initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.55 }} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -53,9 +53,9 @@ export default function ContactSection() {
             {/* Contact info */}
             <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
               {[
-                { icon: <Mail size={14} />, label: 'Email', value: 'john@example.com' },
-                { icon: <MapPin size={14} />, label: 'Location', value: 'New York, NY' },
-                { icon: <Clock size={14} />, label: 'Timezone', value: 'EST / UTC-5' },
+                { icon: <Mail size={14} />, label: 'Email', value: 'emmanlanusga@gmail.com' },
+                { icon: <MapPin size={14} />, label: 'Location', value: 'Naga City, Camarines Sur, Philippines' },
+                { icon: <Clock size={14} />, label: 'Timezone', value: 'PHT / UTC+8' },
               ].map(item => (
                 <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 32, height: 32, background: 'rgba(138,5,255,0.1)', border: '1px solid rgba(138,5,255,0.2)', color: 'var(--color-purple-400)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -74,11 +74,11 @@ export default function ContactSection() {
               <p style={{ fontSize: 11, color: 'var(--color-gray-500)', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 14, fontWeight: 600 }}>Connect</p>
               <div style={{ display: 'flex', gap: 10 }}>
                 {[
-                  { icon: <GithubIcon />, label: 'GitHub', href: '#' },
-                  { icon: <LinkedInIcon />, label: 'LinkedIn', href: '#' },
-                  { icon: <Mail size={15} />, label: 'Email', href: 'mailto:john@example.com' },
+                  { icon: <GithubIcon />, label: 'GitHub', href: 'https://github.com/emngit' },
+                  { icon: <LinkedInIcon />, label: 'LinkedIn', href: 'https://www.linkedin.com/in/jelanusga/' },
+                  { icon: <Mail size={15} />, label: 'Email', href: 'mailto:emmanlanusga@gmail.com' },
                 ].map(s => (
-                  <a key={s.label} href={s.href} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '12px 0', background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', fontSize: 11, color: 'var(--color-text-faint)', textDecoration: 'none' }}>
+                  <a key={s.label} href={s.href} target={s.href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '12px 0', background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', fontSize: 11, color: 'var(--color-text-faint)', textDecoration: 'none' }}>
                     {s.icon}
                     {s.label}
                   </a>
@@ -89,12 +89,12 @@ export default function ContactSection() {
 
           {/* Right form */}
           <motion.div initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.55 }}>
-            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: '40px 44px', position: 'relative' }}>
+            <div className="rg-card-pad" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: '40px 44px', position: 'relative' }}>
               {/* Purple top accent */}
               <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'var(--color-purple-600)' }} />
 
               <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div className="rg-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                   <div>
                     <label style={{ display: 'block', fontSize: 11, color: 'var(--color-gray-500)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8, fontWeight: 600 }}>Name</label>
                     <input required type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Your name" className="input-field" />

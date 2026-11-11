@@ -202,6 +202,7 @@ export default function GithubContributions() {
         <div
           style={{
             flex: 1,
+            minWidth: 0,
             background: '#0d1117',
             border: '1px solid #30363d',
             borderRadius: 8,

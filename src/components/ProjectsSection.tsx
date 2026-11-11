@@ -62,7 +62,7 @@ export default function ProjectsSection() {
           </h2>
         </motion.div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1, background: 'var(--color-border)' }}>
+        <div className="rg-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1, background: 'var(--color-border)' }}>
           {projects.map((p, i) => (
             <motion.div
               key={p.name}

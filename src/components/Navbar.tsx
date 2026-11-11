@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { flushSync } from 'react-dom';
+import { swordThemeTransition } from '@/lib/themeTransition';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import Image from 'next/image';
@@ -23,8 +25,10 @@ function ThemeToggle() {
 
   const toggle = () => {
     const next = !dark;
-    setDark(next);
-    document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light');
+    swordThemeTransition(() => {
+      flushSync(() => setDark(next));
+      document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light');
+    });
   };
 
   return (
@@ -80,6 +84,12 @@ export default function Navbar() {
     setOpen(false);
     document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const openResume = () => {
+    setOpen(false);
+    window.open('/Lanusga-Emman-CV.pdf', '_blank', 'noopener,noreferrer');
+  };
+
 
   return (
     <>
@@ -147,7 +157,7 @@ export default function Navbar() {
           {/* Right CTA */}
           <div className="hidden md:flex" style={{ gap: 12, alignItems: 'center' }}>
             <ThemeToggle />
-            <button className="btn-render-secondary" style={{ height: 42, fontSize: 15, padding: '0 22px' }}>
+            <button className="btn-render-secondary" onClick={openResume} style={{ height: 42, fontSize: 15, padding: '0 22px' }}>
               <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 10, letterSpacing: '0.01em' }}>Resume</span>
             </button>
             <button className="btn-render-primary" onClick={() => go('#contact')} style={{ height: 42, fontSize: 15, padding: '0 22px' }}>
@@ -197,7 +207,7 @@ export default function Navbar() {
                 </button>
               ))}
               <div style={{ display: 'flex', gap: 10, marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--color-border)' }}>
-                <button className="btn-render-secondary" style={{ flex: 1, height: 40, fontSize: 13, justifyContent: 'center' }}>
+                <button className="btn-render-secondary" onClick={openResume} style={{ flex: 1, height: 40, fontSize: 13, justifyContent: 'center' }}>
                   <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 9 }}>Resume</span>
                 </button>
                 <button className="btn-render-primary" style={{ flex: 1, height: 40, fontSize: 13, justifyContent: 'center' }}>

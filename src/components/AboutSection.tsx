@@ -74,18 +74,18 @@ function TerminalWindow() {
         <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#febc2e', display: 'inline-block' }} />
         <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#28c840', display: 'inline-block' }} />
         {/* Tab */}
-        <div style={{ marginLeft: 8, background: '#2a2a2a', border: '1px solid #444', borderRadius: 3, padding: '2px 12px', fontSize: 11, color: '#ccc', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div className="rg-term-tab" style={{ marginLeft: 8, background: '#2a2a2a', border: '1px solid #444', borderRadius: 3, padding: '2px 12px', fontSize: 11, color: '#ccc', display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 10 }}>⬛</span> C:\WINDOWS\system32\cmd.exe
           <span style={{ marginLeft: 6, color: '#777', cursor: 'pointer' }}>✕</span>
         </div>
         {/* Window controls */}
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 16, fontSize: 12, color: '#888' }}>
+        <div className="rg-term-ctrl" style={{ marginLeft: 'auto', display: 'flex', gap: 16, fontSize: 12, color: '#888' }}>
           <span>＋</span><span>□</span>
         </div>
       </div>
 
       {/* Terminal body */}
-      <div style={{ background: '#0c0c0c', padding: '16px 20px', minHeight: 340, color: '#39ff14', fontSize: 13, lineHeight: 1.7 }}>
+      <div className="rg-term-body" style={{ background: '#0c0c0c', padding: '16px 20px', minHeight: 340, color: '#39ff14', fontSize: 13, lineHeight: 1.7 }}>
 
         {/* Boot lines */}
         {visibleCount >= 1 && (
@@ -144,7 +144,7 @@ export default function AboutSection() {
           </h2>
         </motion.div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 80, alignItems: 'start' }}>
+        <div className="rg-about-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 80, alignItems: 'start' }}>
 
           {/* Left — CMD terminal window */}
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>

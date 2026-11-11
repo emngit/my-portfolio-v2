@@ -16,6 +16,7 @@ const GRAVITY = 0.6;
 const JUMP_V = -13;
 const BASE_SPEED = 4.5;
 const SPEED_INC = 0.0005;
+const SKY_SIZE = 56;        // drawn size of the sun / moon sprite
 
 interface DinoState {
   y: number; vy: number; onGround: boolean;
@@ -125,6 +126,41 @@ function drawCloud(ctx: CanvasRenderingContext2D, c: Cloud, isDark = false) {
   ctx.fillRect(c.x + 16, c.y,     18,  8);
 }
 
+/* ── sound effects (synthesised with Web Audio — no asset files) ── */
+type Sfx = 'jump' | 'die' | 'milestone' | 'start';
+let audioCtx: AudioContext | null = null;
+let gameOnScreen = false; // set by the component's IntersectionObserver
+
+function tone(ac: AudioContext, type: OscillatorType, f0: number, f1: number, at: number, dur: number, vol: number) {
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  const t = ac.currentTime + at;
+  osc.type = type;
+  osc.frequency.setValueAtTime(f0, t);
+  osc.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  gain.gain.setValueAtTime(vol, t);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  osc.connect(gain).connect(ac.destination);
+  osc.start(t);
+  osc.stop(t + dur);
+}
+
+function playSound(kind: Sfx) {
+  // Own AudioContext (never touches the Spotify iframe), and silent unless the game is visible.
+  if (typeof window === 'undefined' || !gameOnScreen || document.hidden) return;
+  const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AC) return;
+  audioCtx ??= new AC();
+  const ac = audioCtx;
+  if (ac.state === 'suspended') void ac.resume();
+  switch (kind) {
+    case 'jump':      tone(ac, 'square', 330, 760, 0, 0.16, 0.06); break;
+    case 'start':     tone(ac, 'square', 440, 660, 0, 0.08, 0.05); tone(ac, 'square', 660, 880, 0.08, 0.1, 0.05); break;
+    case 'milestone': tone(ac, 'square', 880, 880, 0, 0.07, 0.05); tone(ac, 'square', 1175, 1175, 0.1, 0.12, 0.05); break;
+    case 'die':       tone(ac, 'sawtooth', 300, 50, 0, 0.45, 0.09); tone(ac, 'square', 120, 40, 0, 0.3, 0.06); break;
+  }
+}
+
 /* ── component ── */
 export default function DinoGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -136,6 +172,8 @@ export default function DinoGame() {
     death: HTMLImageElement[];
     duck:  HTMLImageElement[];
     idle:  HTMLImageElement;
+    moon:  HTMLImageElement;
+    sun:   HTMLImageElement;
   } | null>(null);
 
   if (!imgs.current && typeof window !== 'undefined') {
@@ -145,6 +183,8 @@ export default function DinoGame() {
       death: Array.from({ length: DEATH_FRAMES }, (_, i) => loadImage(deathSrc(i))),
       duck:  Array.from({ length: DUCK_FRAMES },  (_, i) => loadImage(duckSrc(i))),
       idle:  loadImage(idleSrc),
+      moon:  loadImage('/game/soul-eater-moon.png'),
+      sun:   loadImage('/game/soul-eater-sun.png'),
     };
   }
 
@@ -183,8 +223,9 @@ export default function DinoGame() {
 
   const jump = useCallback(() => {
     const s = g.current;
-    if (s.state === 'idle' || s.state === 'dead') { startOrRestart(); return; }
+    if (s.state === 'idle' || s.state === 'dead') { startOrRestart(); playSound('start'); return; }
     if (s.dino.onGround) {
+      playSound('jump');
       s.dino.vy = JUMP_V;
       s.dino.onGround = false;
       s.dino.ducking = false;
@@ -259,33 +300,17 @@ export default function DinoGame() {
       ctx.fillStyle = isDark ? '#1a1a2e' : '#c8b89a';
       ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
 
-      /* ── sun / moon ── */
+      /* ── sun / moon (Soul Eater sprites) ── */
+      const sky = isDark ? imgs.current!.moon : imgs.current!.sun;
+      if (sky.complete && sky.naturalWidth > 0) {
+        ctx.drawImage(sky, W - 104, 24, SKY_SIZE, SKY_SIZE);
+      }
       if (isDark) {
-        // moon — white circle with a grey crater circle offset
-        ctx.fillStyle = '#e8e8d0';
-        ctx.beginPath(); ctx.arc(W - 60, 38, 16, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#c8c8a8';
-        ctx.beginPath(); ctx.arc(W - 54, 32, 6, 0, Math.PI * 2); ctx.fill();
         // stars — fixed positions via seeded pattern
         ctx.fillStyle = 'rgba(255,255,255,0.8)';
         [[40,15],[120,8],[200,20],[300,6],[420,18],[500,10],[80,30],[350,25],[460,35]].forEach(([sx,sy]) => {
           ctx.fillRect(sx, sy, 2, 2);
         });
-      } else {
-        // sun — yellow circle with rays
-        ctx.fillStyle = '#ffe566';
-        ctx.beginPath(); ctx.arc(W - 60, 38, 18, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#ffd700';
-        ctx.beginPath(); ctx.arc(W - 60, 38, 14, 0, Math.PI * 2); ctx.fill();
-        // rays
-        ctx.strokeStyle = '#ffe566';
-        ctx.lineWidth = 2;
-        for (let a = 0; a < Math.PI * 2; a += Math.PI / 4) {
-          ctx.beginPath();
-          ctx.moveTo(W - 60 + Math.cos(a) * 20, 38 + Math.sin(a) * 20);
-          ctx.lineTo(W - 60 + Math.cos(a) * 28, 38 + Math.sin(a) * 28);
-          ctx.stroke();
-        }
       }
 
       /* ground line */
@@ -355,6 +380,7 @@ export default function DinoGame() {
       s.score++;
       s.speed = BASE_SPEED + s.score * SPEED_INC;
       if (s.score > s.hi) s.hi = s.score;
+      if (s.score % 600 === 0) playSound('milestone'); // every 100 displayed points
 
       const d = s.dino;
       d.vy += GRAVITY;
@@ -383,8 +409,9 @@ export default function DinoGame() {
       if (s.nextObs <= 0) {
         const bird = s.score > 250 && Math.random() < 0.3;
         if (bird) {
-          // low bird raised so a ducking character (≈40px tall) fits under it
-          const by = Math.random() < 0.5 ? GROUND_Y - 75 : GROUND_Y - 120;
+          // low plane sits at head height: it hits a standing runner (head at y≈150)
+          // but passes over a ducking one (crouched head at y≈162)
+          const by = Math.random() < 0.5 ? GROUND_Y - 50.6 : GROUND_Y - 90;
           s.obstacles.push({ x: W + 10, y: by, w: 57, h: 30, kind: 'bird' });
         } else {
           const h = 50 + Math.floor(Math.random() * 2) * 16;
@@ -405,15 +432,19 @@ export default function DinoGame() {
         /* collision — tight hitbox */
         const mx = 10, my = 8;
         const dw = SPRITE_W - 14;
-        // ducking character is about 40px tall (sprite sits higher with transparent bottom)
-        const dh = d.ducking ? 40 : SPRITE_H - 8;
+        // Visible pixels of the sprite, measured from d.y (72px sprite, 1.125x scale):
+        //   standing / running: y 16 → 50     ducking (crouch): y 28 → 53
+        // so a ducking character's head is ~12px lower and clears a low plane.
+        const hbTop    = d.y + (d.ducking ? 28 : 16) + 3;
+        const hbBottom = d.y + (d.ducking ? 53 : 50) - 3;
         if (
           DINO_X + mx     < o.x + o.w - mx &&
           DINO_X + dw - mx > o.x + mx      &&
-          d.y    + my     < o.y + o.h - my &&
-          d.y    + dh - my > o.y + my
+          hbTop           < o.y + o.h - my &&
+          hbBottom        > o.y + my
         ) {
           s.state = 'dead';
+          playSound('die');
         }
       }
 
@@ -432,6 +463,15 @@ export default function DinoGame() {
     g.current.raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(g.current.raf);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* sounds only while the game is actually on screen — never from the background */
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const io = new IntersectionObserver(([entry]) => { gameOnScreen = entry.isIntersecting; }, { threshold: 0.3 });
+    io.observe(canvas);
+    return () => { io.disconnect(); gameOnScreen = false; };
   }, []);
 
   /* ── keyboard ── */
@@ -477,6 +517,8 @@ export default function DinoGame() {
           height: 'auto',
           display: 'block',
           cursor: 'pointer',
+          touchAction: 'manipulation',
+
           border: '1px solid var(--color-border)',
           background: '#f7f7f7',
         }}

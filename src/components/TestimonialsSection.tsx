@@ -40,7 +40,7 @@ export default function TestimonialsSection() {
 
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
           {/* Card */}
-          <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: '52px 56px', position: 'relative', minHeight: 260 }}>
+          <div className="rg-card-pad" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: '52px 56px', position: 'relative', minHeight: 260 }}>
             {/* Purple left accent bar */}
             <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, background: 'var(--color-purple-600)' }} />
 

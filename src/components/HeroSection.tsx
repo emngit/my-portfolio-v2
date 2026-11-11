@@ -143,10 +143,10 @@ export default function HeroSection() {
         position: 'relative',
       }}
     >
-      <div style={{ width: '100%', padding: '0 6.25%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, alignItems: 'center', minHeight: 'calc(100vh - var(--nav-height))' }}>
+      <div className="rg-hero-grid" style={{ width: '100%', padding: '0 6.25%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, alignItems: 'center', minHeight: 'calc(100vh - var(--nav-height))' }}>
 
         {/* ── LEFT ── */}
-        <div style={{ padding: '80px 48px 80px 0', display: 'flex', flexDirection: 'column', gap: 28 }}>
+        <div className="rg-hero-left" style={{ padding: '80px 48px 80px 0', display: 'flex', flexDirection: 'column', gap: 28 }}>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -179,7 +179,7 @@ export default function HeroSection() {
 
             {/* Body copy */}
             <p className="text-body-xl-new" style={{ color: 'var(--color-text-faint)', maxWidth: 480 }}>
-              Full Stack Developer specialising in modern web applications,
+              Application Developer specialising in modern web development,
               AI‑powered solutions, cloud systems, and enterprise‑grade platforms.
             </p>
           </motion.div>
@@ -211,6 +211,7 @@ export default function HeroSection() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
+            className="rg-hero-stats"
             style={{ display: 'flex', gap: 40, paddingTop: 16, borderTop: '1px solid var(--color-border)' }}
           >
             {[
@@ -232,10 +233,10 @@ export default function HeroSection() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
           style={{ position: 'relative', padding: '40px 0 40px 40px' }}
-          className="hidden lg:block"
+          className="rg-hero-right"
         >
           {/* Render uses a grid of column borders as decoration */}
-          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', opacity: 0.5 }}>
+          <div className="rg-hero-deco" style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', opacity: 0.5 }}>
             {[0,1,2,3].map(i => (
               <div key={i} style={{ position: 'absolute', top: 0, bottom: 0, left: `${i * 25}%`, width: 1, background: 'var(--color-border)' }} />
             ))}
@@ -243,6 +244,8 @@ export default function HeroSection() {
 
           {/* git push terminal card */}
           <motion.div
+            className="rg-hero-deco"
+
             animate={{ y: [0, -5, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
             style={{
@@ -259,7 +262,7 @@ export default function HeroSection() {
           </motion.div>
 
           {/* Connector line */}
-          <div style={{
+          <div className="rg-hero-deco" style={{
             position: 'absolute', top: 44, left: 'calc(30% + 44px)',
             width: 1, height: 40, zIndex: 5,
             background: 'linear-gradient(180deg, var(--color-purple-500) 0%, transparent 100%)',
@@ -281,7 +284,7 @@ export default function HeroSection() {
               {/* app-backend replaced with Dino game */}
               <DinoGame />
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div className="rg-hero-svc-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <ServiceCard name="app-database" status="Available">
                   <MetricCell label="MEMORY" />
                   <MetricCell label="CPU" />
@@ -299,6 +302,8 @@ export default function HeroSection() {
 
           {/* Purple color block */}
           <motion.div
+            className="rg-hero-deco"
+
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
             style={{
@@ -318,6 +323,7 @@ export default function HeroSection() {
 
       {/* Scroll indicator */}
       <motion.div
+        className="rg-hero-scroll"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
         style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
       >
