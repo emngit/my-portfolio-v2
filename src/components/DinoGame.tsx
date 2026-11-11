@@ -15,6 +15,8 @@ const FOOT_OFFSET = 21;
 const DINO_X = 30;          // fixed x position of character
 const GRAVITY = 0.6;
 const JUMP_V = -13;
+const FAST_FALL_V = 9;      // downward speed an airborne ↓ press snaps to
+const FAST_FALL_GRAVITY = 3; // gravity multiplier while ↓ is held in the air
 const BASE_SPEED = 4.5;
 const SPEED_INC = 0.0005;
 const SKY_SIZE = 56;        // drawn size of the sun / moon sprite
@@ -212,6 +214,7 @@ export default function DinoGame() {
     state: 'idle' as 'idle' | 'running' | 'dead',
     raf: 0,
     pebbleOff: 0,   // frozen pebble offset on death
+    downHeld: false, // ↓ currently held (fast-fall in the air, duck on landing)
   });
 
   const startOrRestart = useCallback(() => {
@@ -241,14 +244,18 @@ export default function DinoGame() {
 
   const setDuck = useCallback((on: boolean) => {
     const s = g.current;
+    s.downHeld = on;
     if (s.state !== 'running') return;
-    if (s.dino.onGround) {
-      // start at pickup_ground_3 (index 2) immediately on press — no tick delay
-      if (on && !s.dino.ducking) { s.dino.frame = 2; s.dino.frameTick = 0; }
-      // on release, reset so run cycle resumes cleanly
-      if (!on && s.dino.ducking) { s.dino.frame = 0; s.dino.frameTick = 0; }
-      s.dino.ducking = on;
+    if (!s.dino.onGround) {
+      // pressing down mid-air slams the character back to the floor
+      if (on && s.dino.vy < FAST_FALL_V) s.dino.vy = FAST_FALL_V;
+      return;
     }
+    // start at pickup_ground_3 (index 2) immediately on press — no tick delay
+    if (on && !s.dino.ducking) { s.dino.frame = 2; s.dino.frameTick = 0; }
+    // on release, reset so run cycle resumes cleanly
+    if (!on && s.dino.ducking) { s.dino.frame = 0; s.dino.frameTick = 0; }
+    s.dino.ducking = on;
   }, []);
 
   /* ── draw character sprite ── */
@@ -271,7 +278,9 @@ export default function DinoGame() {
     }
 
     if (img.complete && img.naturalWidth > 0) {
-      ctx.drawImage(img, DINO_X, d.y, SPRITE_W, SPRITE_H);
+      // the death frames sit ~3px lower in their sprite box than the run frames — lift them so the body rests on the floor
+      const dy = state === 'dead' ? d.y - 3 : d.y;
+      ctx.drawImage(img, DINO_X, dy, SPRITE_W, SPRITE_H);
     }
   }
 
@@ -351,6 +360,13 @@ export default function DinoGame() {
         }
         /* advance death animation */
         if (s.state === 'dead') {
+          /* if we died mid-jump, fall to the floor instead of hovering */
+          const floorY = GROUND_Y - SPRITE_H + FOOT_OFFSET;
+          if (s.dino.y < floorY) {
+            s.dino.vy += GRAVITY;
+            s.dino.y = Math.min(floorY, s.dino.y + s.dino.vy);
+            if (s.dino.y >= floorY) { s.dino.vy = 0; s.dino.onGround = true; }
+          }
           s.dino.deathTick++;
           if (s.dino.deathTick >= 7) {
             s.dino.deathTick = 0;
@@ -390,12 +406,16 @@ export default function DinoGame() {
       if (s.score % 600 === 0) playSound('milestone'); // every 100 displayed points
 
       const d = s.dino;
-      d.vy += GRAVITY;
+      const wasAirborne = !d.onGround;
+      // holding ↓ in the air pulls the character down much faster
+      d.vy += wasAirborne && s.downHeld ? GRAVITY * FAST_FALL_GRAVITY : GRAVITY;
       d.y  += d.vy;
       if (d.y >= GROUND_Y - SPRITE_H + FOOT_OFFSET) {
         d.y = GROUND_Y - SPRITE_H + FOOT_OFFSET;
         d.vy = 0;
         d.onGround = true;
+        // landed while ↓ is still held -> go straight into the duck
+        if (wasAirborne && s.downHeld) { d.ducking = true; d.frame = 2; d.frameTick = 0; }
       }
 
       /* advance run / fall frame */
