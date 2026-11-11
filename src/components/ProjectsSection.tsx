@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { ExternalLink, GitFork, Zap } from 'lucide-react';
 
 const T = 'https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons';
@@ -23,14 +24,25 @@ const TECH_ICONS: Record<string, string> = {
   'Node.js':        `${T}/nodejs/default.svg`,
 };
 
-const projects = [
+interface Project {
+  name: string;
+  description: string;
+  tech: string[];
+  status: string;
+  statusColor: string;
+  metric: string;
+  bannerType?: 'kairos' | 'kada-tipon';
+}
+
+const projects: Project[] = [
   {
-    name: 'Kairos – Jira Copilot Assistant',
-    description: 'AI-powered Jira workflow platform helping IBM OTC teams manage ticket prioritization, compliance workflows, workforce analytics, and RCA / CAPA processes.',
+    name: 'Kairos – Operation Assistant',
+    description: 'AI-powered Jira workflow platform helping IBM OTC teams manage ticket prioritization, compliance workflows, workforce analytics, and RCA / CAPA processes. (Resolve360)',
     tech: ['Vue.js 3', 'FastAPI', 'PostgreSQL', 'Jira', 'GitHub Copilot'],
     status: 'ICA',
     statusColor: 'var(--color-purple-400)',
     metric: 'AI-powered',
+    bannerType: 'kairos',
   },
   {
     name: 'Kada Tipon Game',
@@ -39,6 +51,7 @@ const projects = [
     status: 'Academic',
     statusColor: 'var(--color-green-400)',
     metric: 'EdTech Game',
+    bannerType: 'kada-tipon',
   },
   {
     name: 'SewIt – Tailor Shop Management System',
@@ -73,6 +86,106 @@ export default function ProjectsSection() {
               className="card-hover"
               style={{ background: 'var(--color-surface-raised)', display: 'flex', flexDirection: 'column', cursor: 'default' }}
             >
+              {/* Top logo banner */}
+              {p.bannerType === 'kairos' && (
+                <div
+                  className="res-head"
+                  style={{
+                    padding: '20px 24px',
+                    minHeight: 108,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderBottom: '1px solid var(--color-border)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div className="bg-grid" style={{ position: 'absolute', inset: 0, opacity: 0.4 }} />
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
+                    {/* Main App: Kairos */}
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+                      <Image
+                        src="/Kairos.png"
+                        alt="Kairos App"
+                        width={60}
+                        height={60}
+                        style={{
+                          height: 48,
+                          width: 'auto',
+                          objectFit: 'contain',
+                          filter: 'drop-shadow(0 4px 14px rgba(59, 130, 246, 0.55))',
+                        }}
+                      />
+                      <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '.07em', color: '#ffffff' }}>
+                        KAIROS
+                      </span>
+                    </div>
+
+                    {/* Sub-system divider */}
+                    <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 16 }}>•</span>
+
+                    {/* Nested Module: Resolve360 */}
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '6px 14px',
+                        borderRadius: 999,
+                        background: 'rgba(255, 107, 0, 0.15)',
+                        border: '1px solid rgba(255, 107, 0, 0.4)',
+                      }}
+                      title="Resolve360 module within Kairos"
+                    >
+                      <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#ff9040' }}>
+                        Module
+                      </span>
+                      <Image
+                        src="/Resolve360-Logo-Black-Transparent.png"
+                        alt="Resolve360"
+                        width={160}
+                        height={28}
+                        style={{ maxHeight: 26, width: 'auto', objectFit: 'contain' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {p.bannerType === 'kada-tipon' && (
+                <div
+                  className="res-head"
+                  style={{
+                    padding: '20px 24px',
+                    minHeight: 108,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderBottom: '1px solid var(--color-border)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div className="bg-grid" style={{ position: 'absolute', inset: 0, opacity: 0.4 }} />
+                  <Image
+                    src="/kada-tipon-logo.png"
+                    alt="Kada Tipon Game"
+                    width={320}
+                    height={44}
+                    style={{
+                      position: 'relative',
+                      maxHeight: 44,
+                      width: 'auto',
+                      maxWidth: '90%',
+                      objectFit: 'contain',
+                      imageRendering: 'pixelated',
+                      filter: 'drop-shadow(0 3px 12px rgba(234, 179, 8, 0.35))',
+                    }}
+                  />
+                </div>
+              )}
+
               {/* Card header */}
               <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--color-border)', background: 'var(--color-surface)', position: 'relative', overflow: 'hidden' }}>
                 {/* Background grid */}
@@ -99,7 +212,7 @@ export default function ProjectsSection() {
                   {p.tech.map(t => {
                     const iconUrl = TECH_ICONS[t];
                     return (
-                      <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, padding: '3px 8px', background: 'rgba(138,5,255,0.08)', border: '1px solid rgba(138,5,255,0.2)', color: 'var(--color-purple-300)' }}>
+                      <span key={t} className="badge-purple" style={{ fontSize: 11, padding: '3px 8px' }}>
                         {iconUrl && (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={iconUrl} alt={t} width={12} height={12} style={{ objectFit: 'contain', flexShrink: 0 }} />

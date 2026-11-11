@@ -11,8 +11,8 @@ import { usePathname, useRouter } from 'next/navigation';
 // `target` is a CSS selector for the section to scroll to - these are not real links, so the URL never gets a #hash.
 const NAV = [
   { label: 'Home',       target: '#home' },
-  { label: 'About',      target: '#about' },
   { label: 'Projects',   target: '#projects' },
+  { label: 'About',      target: '#about' },
   { label: 'Experience', target: '#experience' },
   { label: 'Skills',     target: '#skills' },
   { label: 'Contact',    target: '#contact' },

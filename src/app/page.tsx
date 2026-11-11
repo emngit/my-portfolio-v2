@@ -8,7 +8,7 @@ import ProjectsSection from '@/components/ProjectsSection';
 import ExperienceSection from '@/components/ExperienceSection';
 import LearningSection from '@/components/LearningSection';
 import ResourcesSection from '@/components/ResourcesSection';
-import TestimonialsSection from '@/components/TestimonialsSection';
+// import TestimonialsSection from '@/components/TestimonialsSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import AuroraBackground from '@/components/AuroraBackground';
@@ -19,14 +19,14 @@ export default function HomePage() {
       <AuroraBackground />
       {/* Layout */}
       <HeroSection />
+      <ProjectsSection />
       <AboutSection />
       <MusicSection />
-      <ProjectsSection />
       <ExperienceSection />
       <SkillsSection />
       <LearningSection />
       <ResourcesSection />
-      <TestimonialsSection />
+      {/* <TestimonialsSection /> */}
       <ContactSection />
       <Footer />
     </main>

@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { ArrowUpRight, Keyboard } from 'lucide-react';
+import { ArrowUpRight, Gamepad2, Keyboard, Play, Target, Trophy, Zap } from 'lucide-react';
 import { CheckiOLogo, CodewarsLogo, CodinGameLogo, JavaScript30Logo, LearnGitBranchingLogo, LeetCodeLogo, SqlIslandLogo, type IconType } from './resourceLogos';
 
 import TypingTest from './TypingTest';
@@ -54,6 +54,33 @@ export default function ResourcesSection() {
   return (
     <section id="resources" className="bg-grid section-border-b" style={{ background: 'var(--color-background)', padding: '96px 0' }}>
       <div style={{ width: '100%', padding: '0 6.25%' }}>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="panel-purple"
+          style={{ marginBottom: 56, padding: '32px 32px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 28 }}
+        >
+          <div style={{ flex: '1 1 380px', minWidth: 0 }}>
+            <p style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--color-purple-400)', marginBottom: 12 }}>
+              <Gamepad2 size={16} /> Featured Interactive Project
+            </p>
+            <h2 className="text-heading-xl-new" style={{ color: 'var(--color-text-primary)' }}>Coding Typing Challenge</h2>
+            <p style={{ maxWidth: 560, marginTop: 12, fontSize: 15, lineHeight: 1.7, color: 'var(--color-text-faint)' }}>
+              Test your typing speed using real programming keywords, frameworks, and developer terminology.
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '20px 0 0', display: 'flex', flexWrap: 'wrap', gap: '10px 24px', fontSize: 13, color: 'var(--color-text-primary)' }}>
+              <li style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Trophy size={16} color="var(--color-purple-400)" /> Beat 80 WPM</li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Zap size={16} color="var(--color-purple-400)" /> Track Accuracy</li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Target size={16} color="var(--color-purple-400)" /> Developer-Focused Words</li>
+            </ul>
+          </div>
+          <button type="button" onClick={() => setPlaying(true)} className="btn-render-primary">
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}><Play size={16} /> Start Challenge</span>
+          </button>
+        </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} style={{ marginBottom: 56 }}>
           <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--color-purple-400)', marginBottom: 12 }}>Curated List</p>

@@ -65,6 +65,8 @@ const FAVOURITES: Meta[] = [
   { name: 'Indecision (feat. Daniel Caesar)', artist: 'Rex Orange County, Daniel Caesar', url: 'https://open.spotify.com/track/5Iz37U02xYFAs9BId9MwwY', uri: 'spotify:track:5Iz37U02xYFAs9BId9MwwY', image: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e029227aad7e74dca81fa9ff0ba' },
   { name: 'Happiness', artist: 'Rex Orange County', url: 'https://open.spotify.com/track/7aSyG7cskkG3zhfO2JLxq3', uri: 'spotify:track:7aSyG7cskkG3zhfO2JLxq3', image: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e021bd6d088d3d81972af4cb81d' },
   { name: 'Boredom (feat. Rex Orange County & Anna of the North)', artist: 'Tyler, The Creator, Rex Orange County, Anna of the North', url: 'https://open.spotify.com/track/5WNYg3usc6H8N3MBEp4zVk', uri: 'spotify:track:5WNYg3usc6H8N3MBEp4zVk', image: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e028940ac99f49e44f59e6f7fb3', lyricsArtist: 'Tyler, The Creator' },
+  { name: 'Half-Life', artist: 'Duncan Sheik', url: 'https://open.spotify.com/track/4SwcSQIRh7M1dmzyYgCAHs', uri: 'spotify:track:4SwcSQIRh7M1dmzyYgCAHs', image: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e029d72caf1620ff39fe066d6f0' },
+  { name: 'Unwell', artist: 'Matchbox Twenty', url: 'https://open.spotify.com/track/6Bm6qUCSatPAqkQllFL7oA', uri: 'spotify:track:6Bm6qUCSatPAqkQllFL7oA', image: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02b23d1b3eb6fcd4a6c892d4f7' },
 ];
 
 
@@ -473,6 +475,9 @@ export default function MusicSection() {
   const { tracks, activeIdx, custom, current, playback, barOpen, playing, progress, canStep, selectTrack, togglePlay, step, seek, playLink } = useMusic();
   const [link, setLink] = useState('');
   const [linkError, setLinkError] = useState('');
+  const [expanded, setExpanded] = useState(false);
+
+  const visibleTracks = expanded ? tracks : tracks.slice(0, 6);
 
   const submitLink = (e: React.FormEvent) => {
     e.preventDefault();
@@ -573,12 +578,12 @@ export default function MusicSection() {
                 My favourites
               </div>
               <ol style={{ listStyle: 'none' }}>
-                {tracks.map((t, i) => {
+                {visibleTracks.map((t, i) => {
                   const active = !custom && i === activeIdx && (playing || barOpen);
                   return (
                     <li key={t.uri} style={{ borderBottom: '1px solid var(--color-border)' }}>
                       <button type="button" onClick={() => selectTrack(i)}
-                        style={{ width: '100%', display: 'flex', gap: 20, alignItems: 'flex-start', textAlign: 'left', background: 'none', border: 'none', padding: '20px 0', color: 'inherit' }}>
+                        style={{ width: '100%', display: 'flex', gap: 20, alignItems: 'flex-start', textAlign: 'left', background: 'none', border: 'none', padding: '20px 0', color: 'inherit', cursor: 'pointer' }}>
                         <span style={{ fontFamily: mono, fontSize: 12, color: 'var(--color-gray-500)', paddingTop: 8, width: 24, flexShrink: 0 }}>{String(i + 1).padStart(2, '0')}</span>
                         <span style={{ minWidth: 0 }}>
                           <span style={{ display: 'block', fontSize: 'clamp(20px, 2vw, 26px)', fontWeight: 300, color: active ? GREEN : 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</span>
@@ -589,6 +594,44 @@ export default function MusicSection() {
                   );
                 })}
               </ol>
+
+              {tracks.length > 6 && (
+                <div style={{ marginTop: 24 }}>
+                  <button
+                    type="button"
+                    onClick={() => setExpanded((v) => !v)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      background: 'none',
+                      border: '1px solid var(--color-border)',
+                      padding: '10px 20px',
+                      borderRadius: 999,
+                      fontFamily: mono,
+                      fontSize: 12,
+                      letterSpacing: '.06em',
+                      textTransform: 'uppercase',
+                      color: 'var(--color-text-faint)',
+                      cursor: 'pointer',
+                      transition: 'color .2s, border-color .2s, background .2s',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = 'var(--color-text-primary)';
+                      e.currentTarget.style.borderColor = 'var(--color-purple-400)';
+                      e.currentTarget.style.background = 'rgba(138,5,255,0.06)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'var(--color-text-faint)';
+                      e.currentTarget.style.borderColor = 'var(--color-border)';
+                      e.currentTarget.style.background = 'none';
+                    }}
+                  >
+                    <span>{expanded ? 'Hide' : 'See more...'}</span>
+                    <span style={{ fontSize: 10, transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}>▼</span>
+                  </button>
+                </div>
+              )}
             </motion.div>
           </div>
         </div>

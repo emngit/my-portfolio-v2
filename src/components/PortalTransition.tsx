@@ -251,6 +251,8 @@ export function PortalTransitionProvider({ children }: { children: React.ReactNo
       return;
     }
 
+    new Audio('/audio/ricks-portal-gun.mp3').play().catch(() => {});
+
     enterStartRef.current = performance.now();
     setOrigin({ x, y });
     setPhase('enter');

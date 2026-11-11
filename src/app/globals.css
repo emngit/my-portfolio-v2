@@ -269,6 +269,22 @@ body {
   padding: 2px 8px; border-radius: 3px;
 }
 
+[data-theme="light"] .badge-purple {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.08);
+  border-color: rgba(124, 58, 237, 0.22);
+}
+[data-theme="light"] .badge-green {
+  color: #059669;
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+[data-theme="light"] .badge-gray {
+  color: #4b5563;
+  background: rgba(0, 0, 0, 0.04);
+  border-color: var(--color-border);
+}
+
 /* ─── GRADIENT TEXT ─── */
 .gradient-text {
   background: linear-gradient(90deg, var(--color-purple-400), #ff9a5c);
@@ -283,6 +299,12 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Theme visibility helpers */
+.dark-only { display: inline-block !important; }
+.light-only { display: none !important; }
+[data-theme="light"] .dark-only { display: none !important; }
+[data-theme="light"] .light-only { display: inline-block !important; }
 
 /* Resource card header block: identical dark look in both themes (the JavaScript30 logo has white lettering). */
 .res-head {

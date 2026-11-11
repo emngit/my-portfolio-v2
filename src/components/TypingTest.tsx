@@ -35,7 +35,17 @@ export default function TypingTest({ onClose }: { onClose: () => void }) {
   const [pressed, setPressed] = useState('');
   const startRef = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const clickRef = useRef<HTMLAudioElement | null>(null);
   const done = typed.length === text.length;
+
+  // Preload once; each keystroke plays a clone so rapid typing overlaps instead of cutting the sound off.
+  useEffect(() => {
+    clickRef.current = new Audio('/audio/mech-keyboard.mp3');
+  }, []);
+
+  const playClick = useCallback(() => {
+    (clickRef.current?.cloneNode() as HTMLAudioElement | undefined)?.play().catch(() => {});
+  }, []);
 
   const restart = useCallback(() => {
     setText(makeText());
@@ -52,6 +62,7 @@ export default function TypingTest({ onClose }: { onClose: () => void }) {
 
   const addChars = useCallback((chars: string) => {
     if (!chars) return;
+    playClick();
     setTyped((prev) => {
       if (prev.length >= text.length) return prev;
       return (prev + chars).slice(0, text.length);
@@ -60,7 +71,7 @@ export default function TypingTest({ onClose }: { onClose: () => void }) {
       startRef.current = performance.now();
       setStarted(true);
     }
-  }, [started, text.length]);
+  }, [started, text.length, playClick]);
 
   // Keyboard handling. Printable keys are intercepted here; mobile keyboards (key === 'Unidentified') fall through to the hidden input.
   useEffect(() => {
