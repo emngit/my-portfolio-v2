@@ -100,7 +100,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; background: var(--color-background); }
 body {
-  background: var(--color-background);
+  background: transparent; /* html paints the page colour; lets the fixed Aurora (z-index -1) show through */
   color: var(--color-text-primary);
   font-family: 'PP Neue Montreal', -apple-system, "Segoe UI", system-ui, sans-serif;
   overflow-x: hidden;
@@ -457,6 +457,9 @@ body {
    RESPONSIVE — inline-styled layouts are overridden here
    ───────────────────────────────────────────── */
 .rg-exp-timeline { padding-right: 0; }
+/* page-wide Aurora: let the fixed backdrop show through the section backgrounds */
+main > section, main > footer { background-color: transparent !important; }
+
 .rg-player-line { display: none; }
 .rg-ticker-dup { display: none; }
 

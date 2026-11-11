@@ -12,10 +12,12 @@ import ResourcesSection from '@/components/ResourcesSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
+import AuroraBackground from '@/components/AuroraBackground';
 
 export default function HomePage() {
   return (
-    <main className="relative min-h-screen overflow-x-hidden" style={{ background: 'var(--color-background)' }}>
+    <main className="relative min-h-screen overflow-x-hidden">
+      <AuroraBackground />
       {/* Layout */}
       <Navbar />
       <HeroSection />
