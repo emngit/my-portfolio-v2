@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { usePortalTransition } from './PortalTransition';
 
 /* ── Easter-egg icons ── */
 const EGG_ICONS = [
@@ -90,6 +91,7 @@ class Ripple {
 }
 
 export default function PortalGateway() {
+  const { enterPortal } = usePortalTransition();
   const wrapRef   = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef    = useRef<HTMLImageElement>(null);
@@ -239,7 +241,9 @@ export default function PortalGateway() {
   const onClick = useCallback(() => {
     s.current.clicked = true;
     s.current.clickT  = performance.now() / 1000;
-  }, []);
+    const r = wrapRef.current?.getBoundingClientRect();
+    if (r) enterPortal(r.left + r.width / 2, r.top + r.height / 2);
+  }, [enterPortal]);
 
   return (
     <div

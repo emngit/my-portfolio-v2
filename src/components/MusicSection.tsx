@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 const GREEN = '#1DB954';
 
@@ -157,12 +157,34 @@ function WheelHit({ label, left, top, width, height, onClick, disabled = false }
 }
 const mono = "'Consolas','Courier New',monospace";
 
-export default function MusicSection() {
+interface MusicCtxValue {
+  tracks: Meta[]
+  activeIdx: number
+  custom: Meta | null
+  current: Meta
+  playback: PlaybackState
+  barOpen: boolean
+  playing: boolean
+  progress: number
+  canStep: boolean
+  selectTrack: (i: number) => void
+  togglePlay: () => void
+  step: (dir: 1 | -1) => void
+  seek: (e: React.MouseEvent<HTMLDivElement>) => void
+  playLink: (parsed: { uri: string; url: string }) => Promise<void>
+}
+const MusicCtx = createContext<MusicCtxValue | null>(null);
+function useMusic() {
+  const ctx = useContext(MusicCtx);
+  if (!ctx) throw new Error('useMusic must be used inside <MusicProvider>');
+  return ctx;
+}
+
+/** Owns the Spotify controller, docked player and lyrics. Mounted in the root layout so music survives page navigation. */
+export function MusicProvider({ children }: { children: React.ReactNode }) {
   const tracks = FAVOURITES;
   const [activeIdx, setActiveIdx] = useState(0);
   const [custom, setCustom] = useState<Meta | null>(null);
-  const [link, setLink] = useState('');
-  const [linkError, setLinkError] = useState('');
   const [playback, setPlayback] = useState<PlaybackState>({ isPaused: true, isBuffering: false, duration: 0, position: 0 });
   const [barOpen, setBarOpen] = useState(false);
 
@@ -298,11 +320,7 @@ export default function MusicSection() {
     controllerRef.current.seek((playback.duration * frac) / 1000);
   };
 
-  const submitLink = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const parsed = parseSpotifyLink(link.trim());
-    if (!parsed) { setLinkError('Paste a Spotify track, album or playlist link.'); return; }
-    setLinkError('');
+  const playLink = async (parsed: { uri: string; url: string }) => {
     const base: Meta = { name: 'Spotify link', artist: parsed.uri.split(':')[1], url: parsed.url, uri: parsed.uri, image: null };
     setCustom(base);
     playMeta(base);
@@ -319,118 +337,11 @@ export default function MusicSection() {
   const canStep = tracks.length > 1 && !custom;
 
 
+  const value: MusicCtxValue = { tracks, activeIdx, custom, current, playback, barOpen, playing, progress, canStep, selectTrack, togglePlay, step, seek, playLink };
+
   return (
-    <>
-      <section id="music" className="bg-grid section-border-b" style={{ background: 'var(--color-background)', padding: '96px 0' }}>
-        <div style={{ width: '100%', padding: '0 6.25%' }}>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} style={{ marginBottom: 56 }}>
-            <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--color-purple-400)', marginBottom: 12 }}>Music</p>
-            <h2 className="text-heading-xl-new" style={{ color: 'var(--color-text-primary)' }}>
-              What I have <br /><span className="gradient-text-purple">on repeat</span>
-            </h2>
-          </motion.div>
-
-          <div className="rg-music-grid" style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 64, alignItems: 'start' }}>
-
-            {/* Left — player card + paste-a-link */}
-            <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} style={{ minWidth: 0 }}>
-              <form onSubmit={submitLink} style={{ display: 'flex', gap: 12, maxWidth: 360, margin: '0 auto 20px' }}>
-                <input
-                  value={link}
-                  onChange={(e) => setLink(e.target.value)}
-                  placeholder="Paste a Spotify link"
-                  aria-label="Spotify link"
-                  className="input-field"
-                  style={{ borderRadius: 999, padding: '.8rem 1.2rem', minWidth: 0 }}
-                />
-                <button type="submit" className="btn-render-primary" style={{ borderRadius: 999, flexShrink: 0 }}><span>Play</span></button>
-              </form>
-              {linkError && <p style={{ fontSize: 12, color: '#ff6b6b', maxWidth: 360, margin: '-8px auto 16px' }}>{linkError}</p>}
-
-              {/* iPod — the PNG has a transparent screen window, so the "screen" sits underneath it */}
-              <div style={{ position: 'relative', width: '100%', maxWidth: 360, aspectRatio: '1200 / 1975', margin: '0 auto', containerType: 'inline-size', filter: 'drop-shadow(0 24px 36px rgba(0,0,0,.32))' }}>
-                <div style={{ position: 'absolute', left: '8.08%', top: '4.96%', width: '83.9%', height: '38.3%', background: '#fff', color: '#111', display: 'flex', flexDirection: 'column', overflow: 'hidden', fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
-                  <div style={{ height: '15%', flexShrink: 0, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(#f4f7fb, #b4c0d4)', borderBottom: '1px solid #8793a8', fontSize: '4.4cqw', fontWeight: 700, color: '#222' }}>
-                    <span style={{ position: 'absolute', left: '3cqw', fontSize: '3.2cqw', color: '#2a6fd6' }}>{playing ? '▶' : '❚❚'}</span>
-                    Now Playing
-                  </div>
-                  <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', gap: '3.5cqw', padding: '0 3.5cqw' }}>
-                    <div style={{ width: '29cqw', height: '29cqw', flexShrink: 0, background: '#d8dde6', boxShadow: '0 1px 4px rgba(0,0,0,.4)', overflow: 'hidden' }}>
-                      {current?.image && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={current.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                      )}
-                    </div>
-                    <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontSize: '4.8cqw', fontWeight: 700, lineHeight: 1.2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>{current.name}</div>
-                      <div style={{ fontSize: '4cqw', color: '#3d4d69', marginTop: '1.2cqw', lineHeight: 1.2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{current.artist}</div>
-                    </div>
-                  </div>
-                  <div style={{ flexShrink: 0, padding: '0 3.5cqw 2.5cqw' }}>
-                    <div onClick={seek} style={{ height: '5cqw', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                      <div style={{ width: '100%', height: '2.6cqw', border: '1px solid #7d8ba3', borderRadius: 2, background: 'linear-gradient(#dfe4ec, #f6f8fb)', overflow: 'hidden' }}>
-                        <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(#5ea2f5, #1f63c6)' }} />
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '3.4cqw', fontWeight: 600, color: '#333', fontVariantNumeric: 'tabular-nums' }}>
-                      <span>{fmt(playback.position)}</span>
-                      <span>{playback.duration > 0 ? `-${fmt(playback.duration - playback.position)}` : '--:--'}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/ipod.png" alt="iPod" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block', pointerEvents: 'none', userSelect: 'none', zIndex: 1 }} />
-
-                {/* click-wheel hot spots */}
-                <WheelHit label="Open my Spotify profile" left="42.65%" top="55.1%" width="11.7%" height="7.1%" onClick={() => window.open(PROFILE_URL, '_blank', 'noopener,noreferrer')} />
-                <WheelHit label="Previous track" left="19.3%" top="69.25%" width="11.7%" height="7.1%" onClick={() => step(-1)} disabled={!canStep} />
-                <WheelHit label="Next track" left="66%" top="69.25%" width="11.7%" height="7.1%" onClick={() => step(1)} disabled={!canStep} />
-                <WheelHit label={playing ? 'Pause' : 'Play'} left="42.65%" top="83.4%" width="11.7%" height="7.1%" onClick={togglePlay} />
-                <WheelHit label={playing ? 'Pause' : 'Play'} left="39.15%" top="67.1%" width="18.7%" height="11.3%" onClick={togglePlay} />
-              </div>
-
-              {/* Spotify profile button */}
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 28 }}>
-                <a href={PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-spotify">
-                  <SpotifyGlyph />
-                  <span>Spotify</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="20" viewBox="0 0 10 20" fill="currentColor" aria-hidden="true">
-                    <rect x="6" y="9" width="2" height="2" /><rect x="4" y="7" width="2" height="2" /><rect x="2" y="5" width="2" height="2" />
-                    <rect x="4" y="11" width="2" height="2" /><rect x="2" y="13" width="2" height="2" /><rect x="0" y="15" width="2" height="2" /><rect x="0" y="3" width="2" height="2" />
-                  </svg>
-                </a>
-              </div>
-
-            </motion.div>
-
-            {/* Right — favourites */}
-            <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }} style={{ minWidth: 0 }}>
-              <div style={{ fontFamily: mono, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--color-gray-400)', paddingBottom: 14, borderBottom: '1px solid var(--color-text-primary)' }}>
-                My favourites
-              </div>
-              <ol style={{ listStyle: 'none' }}>
-                {tracks.map((t, i) => {
-                  const active = !custom && i === activeIdx && (playing || barOpen);
-                  return (
-                    <li key={t.uri} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                      <button type="button" onClick={() => selectTrack(i)}
-                        style={{ width: '100%', display: 'flex', gap: 20, alignItems: 'flex-start', textAlign: 'left', background: 'none', border: 'none', padding: '20px 0', color: 'inherit' }}>
-                        <span style={{ fontFamily: mono, fontSize: 12, color: 'var(--color-gray-500)', paddingTop: 8, width: 24, flexShrink: 0 }}>{String(i + 1).padStart(2, '0')}</span>
-                        <span style={{ minWidth: 0 }}>
-                          <span style={{ display: 'block', fontSize: 'clamp(20px, 2vw, 26px)', fontWeight: 300, color: active ? GREEN : 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</span>
-                          <span style={{ display: 'block', fontFamily: mono, fontSize: 12, letterSpacing: '.04em', textTransform: 'uppercase', color: 'var(--color-gray-500)', marginTop: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.artist}</span>
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ol>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+    <MusicCtx.Provider value={value}>
+      {children}
 
       {/* Hidden Spotify embed that actually plays the audio in the background */}
       <div aria-hidden="true" style={{ position: 'fixed', left: 0, bottom: 0, width: 300, height: 80, opacity: 0, pointerEvents: 'none', zIndex: -1 }}>
@@ -554,6 +465,133 @@ export default function MusicSection() {
         </motion.div>
       )}
       </AnimatePresence>
-    </>
+    </MusicCtx.Provider>
+  );
+}
+
+export default function MusicSection() {
+  const { tracks, activeIdx, custom, current, playback, barOpen, playing, progress, canStep, selectTrack, togglePlay, step, seek, playLink } = useMusic();
+  const [link, setLink] = useState('');
+  const [linkError, setLinkError] = useState('');
+
+  const submitLink = (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = parseSpotifyLink(link.trim());
+    if (!parsed) { setLinkError('Paste a Spotify track, album or playlist link.'); return; }
+    setLinkError('');
+    void playLink(parsed);
+  };
+
+  return (
+      <section id="music" className="bg-grid section-border-b" style={{ background: 'var(--color-background)', padding: '96px 0' }}>
+        <div style={{ width: '100%', padding: '0 6.25%' }}>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} style={{ marginBottom: 56 }}>
+            <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--color-purple-400)', marginBottom: 12 }}>Music</p>
+            <h2 className="text-heading-xl-new" style={{ color: 'var(--color-text-primary)' }}>
+              What I have <br /><span className="gradient-text-purple">on repeat</span>
+            </h2>
+          </motion.div>
+
+          <div className="rg-music-grid" style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 64, alignItems: 'start' }}>
+
+            {/* Left — player card + paste-a-link */}
+            <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} style={{ minWidth: 0 }}>
+              <form onSubmit={submitLink} style={{ display: 'flex', gap: 12, maxWidth: 360, margin: '0 auto 20px' }}>
+                <input
+                  value={link}
+                  onChange={(e) => setLink(e.target.value)}
+                  placeholder="Paste a Spotify link"
+                  aria-label="Spotify link"
+                  className="input-field"
+                  style={{ borderRadius: 999, padding: '.8rem 1.2rem', minWidth: 0 }}
+                />
+                <button type="submit" className="btn-render-primary" style={{ borderRadius: 999, flexShrink: 0 }}><span>Play</span></button>
+              </form>
+              {linkError && <p style={{ fontSize: 12, color: '#ff6b6b', maxWidth: 360, margin: '-8px auto 16px' }}>{linkError}</p>}
+
+              {/* iPod — the PNG has a transparent screen window, so the "screen" sits underneath it */}
+              <div style={{ position: 'relative', width: '100%', maxWidth: 360, aspectRatio: '1200 / 1975', margin: '0 auto', containerType: 'inline-size', filter: 'drop-shadow(0 24px 36px rgba(0,0,0,.32))' }}>
+                <div style={{ position: 'absolute', left: '8.08%', top: '4.96%', width: '83.9%', height: '38.3%', background: '#fff', color: '#111', display: 'flex', flexDirection: 'column', overflow: 'hidden', fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
+                  <div style={{ height: '15%', flexShrink: 0, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(#f4f7fb, #b4c0d4)', borderBottom: '1px solid #8793a8', fontSize: '4.4cqw', fontWeight: 700, color: '#222' }}>
+                    <span style={{ position: 'absolute', left: '3cqw', fontSize: '3.2cqw', color: '#2a6fd6' }}>{playing ? '▶' : '❚❚'}</span>
+                    Now Playing
+                  </div>
+                  <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', gap: '3.5cqw', padding: '0 3.5cqw' }}>
+                    <div style={{ width: '29cqw', height: '29cqw', flexShrink: 0, background: '#d8dde6', boxShadow: '0 1px 4px rgba(0,0,0,.4)', overflow: 'hidden' }}>
+                      {current?.image && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={current.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      )}
+                    </div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontSize: '4.8cqw', fontWeight: 700, lineHeight: 1.2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>{current.name}</div>
+                      <div style={{ fontSize: '4cqw', color: '#3d4d69', marginTop: '1.2cqw', lineHeight: 1.2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{current.artist}</div>
+                    </div>
+                  </div>
+                  <div style={{ flexShrink: 0, padding: '0 3.5cqw 2.5cqw' }}>
+                    <div onClick={seek} style={{ height: '5cqw', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                      <div style={{ width: '100%', height: '2.6cqw', border: '1px solid #7d8ba3', borderRadius: 2, background: 'linear-gradient(#dfe4ec, #f6f8fb)', overflow: 'hidden' }}>
+                        <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(#5ea2f5, #1f63c6)' }} />
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '3.4cqw', fontWeight: 600, color: '#333', fontVariantNumeric: 'tabular-nums' }}>
+                      <span>{fmt(playback.position)}</span>
+                      <span>{playback.duration > 0 ? `-${fmt(playback.duration - playback.position)}` : '--:--'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/ipod.png" alt="iPod" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block', pointerEvents: 'none', userSelect: 'none', zIndex: 1 }} />
+
+                {/* click-wheel hot spots */}
+                <WheelHit label="Open my Spotify profile" left="42.65%" top="55.1%" width="11.7%" height="7.1%" onClick={() => window.open(PROFILE_URL, '_blank', 'noopener,noreferrer')} />
+                <WheelHit label="Previous track" left="19.3%" top="69.25%" width="11.7%" height="7.1%" onClick={() => step(-1)} disabled={!canStep} />
+                <WheelHit label="Next track" left="66%" top="69.25%" width="11.7%" height="7.1%" onClick={() => step(1)} disabled={!canStep} />
+                <WheelHit label={playing ? 'Pause' : 'Play'} left="42.65%" top="83.4%" width="11.7%" height="7.1%" onClick={togglePlay} />
+                <WheelHit label={playing ? 'Pause' : 'Play'} left="39.15%" top="67.1%" width="18.7%" height="11.3%" onClick={togglePlay} />
+              </div>
+
+              {/* Spotify profile button */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 28 }}>
+                <a href={PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-spotify">
+                  <SpotifyGlyph />
+                  <span>Spotify</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="20" viewBox="0 0 10 20" fill="currentColor" aria-hidden="true">
+                    <rect x="6" y="9" width="2" height="2" /><rect x="4" y="7" width="2" height="2" /><rect x="2" y="5" width="2" height="2" />
+                    <rect x="4" y="11" width="2" height="2" /><rect x="2" y="13" width="2" height="2" /><rect x="0" y="15" width="2" height="2" /><rect x="0" y="3" width="2" height="2" />
+                  </svg>
+                </a>
+              </div>
+
+            </motion.div>
+
+            {/* Right — favourites */}
+            <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }} style={{ minWidth: 0 }}>
+              <div style={{ fontFamily: mono, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--color-gray-400)', paddingBottom: 14, borderBottom: '1px solid var(--color-text-primary)' }}>
+                My favourites
+              </div>
+              <ol style={{ listStyle: 'none' }}>
+                {tracks.map((t, i) => {
+                  const active = !custom && i === activeIdx && (playing || barOpen);
+                  return (
+                    <li key={t.uri} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                      <button type="button" onClick={() => selectTrack(i)}
+                        style={{ width: '100%', display: 'flex', gap: 20, alignItems: 'flex-start', textAlign: 'left', background: 'none', border: 'none', padding: '20px 0', color: 'inherit' }}>
+                        <span style={{ fontFamily: mono, fontSize: 12, color: 'var(--color-gray-500)', paddingTop: 8, width: 24, flexShrink: 0 }}>{String(i + 1).padStart(2, '0')}</span>
+                        <span style={{ minWidth: 0 }}>
+                          <span style={{ display: 'block', fontSize: 'clamp(20px, 2vw, 26px)', fontWeight: 300, color: active ? GREEN : 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</span>
+                          <span style={{ display: 'block', fontFamily: mono, fontSize: 12, letterSpacing: '.04em', textTransform: 'uppercase', color: 'var(--color-gray-500)', marginTop: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.artist}</span>
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            </motion.div>
+          </div>
+        </div>
+      </section>
   );
 }

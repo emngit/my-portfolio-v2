@@ -1,30 +1,43 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { flushSync } from 'react-dom';
 import { swordThemeTransition } from '@/lib/themeTransition';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 
+// `target` is a CSS selector for the section to scroll to - these are not real links, so the URL never gets a #hash.
 const NAV = [
-  { label: 'Home',       href: '#home' },
-  { label: 'About',      href: '#about' },
-  { label: 'Projects',   href: '#projects' },
-  { label: 'Experience', href: '#experience' },
-  { label: 'Skills',     href: '#skills' },
-  { label: 'Contact',    href: '#contact' },
+  { label: 'Home',       target: '#home' },
+  { label: 'About',      target: '#about' },
+  { label: 'Projects',   target: '#projects' },
+  { label: 'Experience', target: '#experience' },
+  { label: 'Skills',     target: '#skills' },
+  { label: 'Contact',    target: '#contact' },
 ];
 
-function ThemeToggle() {
-  const [dark, setDark] = useState(true);
+function ThemeToggle({ disabled = false }: { disabled?: boolean }) {
+  const [darkPref, setDark] = useState(true);
+  const dark = disabled || darkPref;
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'dark');
   }, []);
 
+  // While disabled (Safe Space is always dark) pin the dark theme, then restore the visitor's choice on leave.
+  useEffect(() => {
+    if (!disabled) return;
+    const root = document.documentElement;
+    const prev = root.getAttribute('data-theme');
+    root.setAttribute('data-theme', 'dark');
+    return () => { if (prev) root.setAttribute('data-theme', prev); };
+  }, [disabled]);
+
   const toggle = () => {
-    const next = !dark;
+    if (disabled) return;
+    const next = !darkPref;
     swordThemeTransition(() => {
       flushSync(() => setDark(next));
       document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light');
@@ -34,14 +47,17 @@ function ThemeToggle() {
   return (
     <button
       onClick={toggle}
+      disabled={disabled}
       aria-label="Toggle dark / light mode"
+      title={disabled ? 'Theme is locked in Safe Space' : undefined}
       style={{
+        opacity: disabled ? 0.45 : 1,
         position: 'relative',
         width: 52, height: 28,
         borderRadius: 999,
         background: dark ? '#1a1a2e' : '#e0e7ff',
         border: `1px solid ${dark ? 'rgba(170,119,253,0.35)' : '#c7d2fe'}`,
-        cursor: 'pointer',
+        cursor: disabled ? 'not-allowed' : 'pointer',
         flexShrink: 0,
         transition: 'background .3s, border-color .3s',
         display: 'flex', alignItems: 'center',
@@ -71,6 +87,8 @@ function ThemeToggle() {
 }
 
 export default function Navbar() {
+  const router = useRouter();
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen]         = useState(false);
 
@@ -80,9 +98,27 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', fn);
   }, []);
 
-  const go = (href: string) => {
+  // Section to scroll to once we are back on the home page (e.g. when navigating from Safe Space).
+  const pendingTarget = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (pathname !== '/' || !pendingTarget.current) return;
+    const target = pendingTarget.current;
+    pendingTarget.current = null;
+    let tries = 0, raf = 0;
+    const scrollWhenReady = () => {
+      const el = document.querySelector(target);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      else if (tries++ < 30) raf = requestAnimationFrame(scrollWhenReady);
+    };
+    raf = requestAnimationFrame(scrollWhenReady);
+    return () => cancelAnimationFrame(raf);
+  }, [pathname]);
+
+  const go = (target: string) => {
     setOpen(false);
-    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+    if (pathname !== '/') { pendingTarget.current = target; router.push('/'); return; }
+    document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const openResume = () => {
@@ -125,7 +161,7 @@ export default function Navbar() {
             {NAV.map(n => (
               <button
                 key={n.label}
-                onClick={() => go(n.href)}
+                onClick={() => go(n.target)}
                 className="group relative"
                 style={{
                   padding: '0 20px',
@@ -156,7 +192,7 @@ export default function Navbar() {
 
           {/* Right CTA */}
           <div className="hidden md:flex" style={{ gap: 12, alignItems: 'center' }}>
-            <ThemeToggle />
+            <ThemeToggle disabled={pathname === '/safe-space'} />
             <button className="btn-render-secondary" onClick={openResume} style={{ height: 42, fontSize: 15, padding: '0 22px' }}>
               <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 10, letterSpacing: '0.01em' }}>Resume</span>
             </button>
@@ -196,7 +232,7 @@ export default function Navbar() {
               {NAV.map(n => (
                 <button
                   key={n.label}
-                  onClick={() => go(n.href)}
+                  onClick={() => go(n.target)}
                   style={{
                     textAlign: 'left', padding: '12px 16px',
                     background: 'none', border: 'none', cursor: 'pointer',

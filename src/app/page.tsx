@@ -1,6 +1,5 @@
 'use client';
 
-import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import AboutSection from '@/components/AboutSection';
 import MusicSection from '@/components/MusicSection';
@@ -19,7 +18,6 @@ export default function HomePage() {
     <main className="relative min-h-screen overflow-x-hidden">
       <AuroraBackground />
       {/* Layout */}
-      <Navbar />
       <HeroSection />
       <AboutSection />
       <MusicSection />

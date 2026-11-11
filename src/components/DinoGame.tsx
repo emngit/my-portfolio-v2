@@ -18,7 +18,10 @@ const JUMP_V = -13;
 const FAST_FALL_V = 9;      // downward speed an airborne ↓ press snaps to
 const FAST_FALL_GRAVITY = 3; // gravity multiplier while ↓ is held in the air
 const BASE_SPEED = 4.5;
-const SPEED_INC = 0.0005;
+const MAX_SPEED = 12;       // cap: at 60fps the obstacle is on screen ≥ ~0.7s, still enough to react
+const SPEED_INC = 0.001;    // per frame -> reaches MAX_SPEED after ~75s of play
+const MIN_GAP_FRAMES = 56;  // min time between obstacle spawns (a jump lasts ≈ 43 frames)
+const PAIR_GAP = 34;        // px between the two buildings of a pair
 const SKY_SIZE = 56;        // drawn size of the sun / moon sprite
 
 interface DinoState {
@@ -26,8 +29,66 @@ interface DinoState {
   frame: number; frameTick: number; ducking: boolean;
   deathFrame: number; deathTick: number;
 }
-interface Obstacle { x: number; y: number; w: number; h: number; kind: 'cactus' | 'bird'; }
+interface Obstacle { x: number; y: number; w: number; h: number; kind: 'cactus' | 'bird'; art?: 'plane' | 'ufo'; }
 interface Cloud     { x: number; y: number; }
+interface Smoke     { x: number; y: number; vx: number; vy: number; life: number; max: number; }
+const SMOKE_PX = 3;         // pixel size of the slide dust
+
+/* ── collision impact: pixel burst + flying debris (same chunky-pixel look as the sprites) ── */
+interface Spark  { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; color: string; }
+interface Impact { sparks: Spark[]; age: number; x: number; y: number; }
+const SPARK_COLORS = ['#ffffff', '#ffe066', '#ff9f43', '#ff5e5e'];
+const snap3 = (n: number) => Math.round(n / 3) * 3;
+
+function spawnImpact(im: Impact, x: number, y: number, kind: 'cactus' | 'bird') {
+  im.x = x; im.y = y; im.age = 0; im.sparks = [];
+  const debris = kind === 'bird' ? '#c9a27a' : '#8a8fa8';
+  for (let i = 0; i < 26; i++) {
+    const ang = Math.random() * Math.PI * 2;
+    const sp = 1.5 + Math.random() * 4.5;
+    im.sparks.push({
+      x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - 1.5,
+      life: 0, max: 28 + Math.floor(Math.random() * 18),
+      size: Math.random() < 0.5 ? 3 : 6,
+      color: i < 8 ? debris : SPARK_COLORS[Math.floor(Math.random() * SPARK_COLORS.length)],
+    });
+  }
+}
+
+/** Advances and draws the impact — call exactly once per frame, after the character. */
+function drawImpact(ctx: CanvasRenderingContext2D, im: Impact) {
+  if (im.age >= 0 && im.age < 10) {
+    const a = im.age;
+    const r = 6 + a * 4;
+    const size = a < 5 ? 6 : 3;
+    ctx.globalAlpha = 1 - a / 10;
+    ctx.fillStyle = a < 4 ? '#ffffff' : a < 7 ? '#ffe066' : '#ff9f43';
+    for (let k = 0; k < 8; k++) {
+      const ang = (k * Math.PI) / 4;
+      ctx.fillRect(snap3(im.x + Math.cos(ang) * r) - size / 2, snap3(im.y + Math.sin(ang) * r) - size / 2, size, size);
+    }
+    if (a < 3) { // brief white flash at the point of impact
+      const f = 18 - a * 5;
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(Math.round(im.x - f / 2), Math.round(im.y - f / 2), f, f);
+    }
+    im.age++;
+  }
+  for (let i = im.sparks.length - 1; i >= 0; i--) {
+    const p = im.sparks[i];
+    p.life++;
+    p.vy += 0.28;
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.y > GROUND_Y) { p.y = GROUND_Y; p.vy *= -0.4; p.vx *= 0.7; }
+    if (p.life >= p.max) { im.sparks.splice(i, 1); continue; }
+    ctx.globalAlpha = p.life / p.max > 0.7 ? 0.35 : 1;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(snap3(p.x), snap3(p.y), p.size, p.size);
+  }
+  ctx.globalAlpha = 1;
+}
 
 /* ── sprite sheet paths ── */
 const RUN_FRAMES   = 8;
@@ -181,6 +242,7 @@ export default function DinoGame() {
     death: HTMLImageElement[];
     duck:  HTMLImageElement[];
     idle:  HTMLImageElement;
+    ufo:   HTMLImageElement;
     moon:  HTMLImageElement;
     sun:   HTMLImageElement;
   } | null>(null);
@@ -192,6 +254,7 @@ export default function DinoGame() {
       death: Array.from({ length: DEATH_FRAMES }, (_, i) => loadImage(deathSrc(i))),
       duck:  Array.from({ length: DUCK_FRAMES },  (_, i) => loadImage(duckSrc(i))),
       idle:  loadImage(idleSrc),
+      ufo:   loadImage('/game/rick-and-morty-spaceship.png'),
       moon:  loadImage('/game/soul-eater-moon.png'),
       sun:   loadImage('/game/soul-eater-sun.png'),
     };
@@ -215,6 +278,10 @@ export default function DinoGame() {
     raf: 0,
     pebbleOff: 0,   // frozen pebble offset on death
     downHeld: false, // ↓ currently held (fast-fall in the air, duck on landing)
+    smoke: [] as Smoke[],
+    smokeTick: 0,
+    impact: { sparks: [], age: -1, x: 0, y: 0 } as Impact,
+    shake: 0,        // frames of screen-shake left after a crash
   });
 
   const startOrRestart = useCallback(() => {
@@ -225,6 +292,9 @@ export default function DinoGame() {
       deathFrame: 0, deathTick: 0,
     };
     s.obstacles = [];
+    s.smoke = [];
+    s.impact = { sparks: [], age: -1, x: 0, y: 0 };
+    s.shake = 0;
     s.score = 0;
     s.speed = BASE_SPEED;
     s.nextObs = 70;
@@ -296,6 +366,15 @@ export default function DinoGame() {
 
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
+      /* screen shake after a crash — fresh transform every frame, back to identity when it ends */
+      if (s.shake > 0) {
+        const amp = Math.ceil(s.shake / 4);
+        ctx.setTransform(1, 0, 0, 1, Math.round((Math.random() * 2 - 1) * amp), Math.round((Math.random() * 2 - 1) * amp));
+        s.shake--;
+      } else {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+      }
+
       /* ── sky background ── */
       if (isDark) {
         // night sky gradient
@@ -310,11 +389,11 @@ export default function DinoGame() {
         grad.addColorStop(1,   '#e0f4ff');
         ctx.fillStyle = grad;
       }
-      ctx.fillRect(0, 0, W, GROUND_Y);
+      ctx.fillRect(-8, -8, W + 16, GROUND_Y + 8); // oversized so the screen-shake never exposes an edge
 
       /* ── ground strip ── */
       ctx.fillStyle = isDark ? '#1a1a2e' : '#c8b89a';
-      ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+      ctx.fillRect(-8, GROUND_Y, W + 16, H - GROUND_Y + 8);
 
       /* ── sun / moon (Soul Eater sprites) ── */
       const sky = isDark ? imgs.current!.moon : imgs.current!.sun;
@@ -332,7 +411,7 @@ export default function DinoGame() {
       /* ground line */
       ctx.strokeStyle = isDark ? '#3a3a5a' : '#888';
       ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(0, GROUND_Y + 2); ctx.lineTo(W, GROUND_Y + 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-8, GROUND_Y + 2); ctx.lineTo(W + 8, GROUND_Y + 2); ctx.stroke();
 
       /* ground pebbles — scroll at exactly the obstacle speed (px per frame) so the floor and buildings stay in sync */
       ctx.fillStyle = isDark ? '#2a2a4a' : '#aaa';
@@ -375,6 +454,7 @@ export default function DinoGame() {
         }
 
         drawCharacter(ctx, s.dino, s.state);
+        drawImpact(ctx, s.impact);
 
         ctx.fillStyle = isDark ? '#c8c8e8' : '#535353';
         ctx.textAlign = 'center';
@@ -401,7 +481,7 @@ export default function DinoGame() {
 
       /* ── physics ── */
       s.score++;
-      s.speed = BASE_SPEED + s.score * SPEED_INC;
+      s.speed = Math.min(MAX_SPEED, BASE_SPEED + s.score * SPEED_INC);
       if (s.score > s.hi) s.hi = s.score;
       if (s.score % 600 === 0) playSound('milestone'); // every 100 displayed points
 
@@ -431,21 +511,57 @@ export default function DinoGame() {
       s.wingTick++;
       if (s.wingTick >= 10) { s.wingFrame++; s.wingTick = 0; }
 
-      /* spawn obstacles */
+      /* spawn obstacles — difficulty (0..1) follows how close we are to top speed */
       s.nextObs--;
       if (s.nextObs <= 0) {
-        const bird = s.score > 250 && Math.random() < 0.3;
+        const diff = (s.speed - BASE_SPEED) / (MAX_SPEED - BASE_SPEED);
+        let extraFrames = 0;
+        const bird = s.score > 250 && Math.random() < 0.15 + 0.25 * diff;
         if (bird) {
           // low plane sits at head height: it hits a standing runner (head at y≈150)
           // but passes over a ducking one (crouched head at y≈162)
           const by = Math.random() < 0.5 ? GROUND_Y - 50.6 : GROUND_Y - 90;
-          s.obstacles.push({ x: W + 10, y: by, w: 57, h: 30, kind: 'bird' });
+          // same size / hitbox either way — the spaceship is just a different skin for the flying obstacle
+          s.obstacles.push({ x: W + 10, y: by, w: 57, h: 30, kind: 'bird', art: Math.random() < 0.5 ? 'ufo' : 'plane' });
         } else {
           const h = 50 + Math.floor(Math.random() * 2) * 16;
           s.obstacles.push({ x: W + 10, y: GROUND_Y - h, w: 28, h, kind: 'cactus' });
+          // later on, some buildings come in pairs — the pair is still cleared by a single jump
+          if (diff > 0.2 && Math.random() < 0.15 + 0.3 * diff) {
+            const h2 = 50 + Math.floor(Math.random() * 2) * 16;
+            s.obstacles.push({ x: W + 10 + 28 + PAIR_GAP, y: GROUND_Y - h2, w: 28, h: h2, kind: 'cactus' });
+            extraFrames = Math.ceil((28 + PAIR_GAP) / s.speed);
+          }
         }
-        s.nextObs = 55 + Math.floor(Math.random() * 65);
+        // The time between obstacles never drops below MIN_GAP_FRAMES (jump airtime ≈ 43 frames + landing/reaction),
+        // so every obstacle stays dodgeable however fast it gets — only the random extra shrinks.
+        s.nextObs = MIN_GAP_FRAMES + extraFrames + Math.floor(Math.random() * (70 - 40 * diff));
       }
+
+      /* dust kicked up while sliding (ducking on the ground) — chunky square pixels like the sprite art */
+      if (d.ducking && d.onGround) {
+        s.smokeTick++;
+        if (s.smokeTick % 2 === 0) {
+          s.smoke.push({
+            x: DINO_X + 14 + Math.random() * 14, y: GROUND_Y - 2 - Math.random() * 4,
+            vx: -(0.4 + Math.random() * 0.9), vy: -(0.1 + Math.random() * 0.35),
+            life: 0, max: 20 + Math.floor(Math.random() * 12),
+          });
+        }
+      }
+      ctx.fillStyle = isDark ? '#c8c8e8' : '#8c8c8c';
+      for (let i = s.smoke.length - 1; i >= 0; i--) {
+        const p = s.smoke[i];
+        p.life++;
+        p.x += p.vx - s.speed;      // drifts back with the scrolling ground
+        p.y += p.vy;
+        if (p.life >= p.max || p.x < -8) { s.smoke.splice(i, 1); continue; }
+        const t = p.life / p.max;
+        const size = t > 0.4 ? SMOKE_PX * 2 : SMOKE_PX;       // puffs grow a pixel step as they age
+        ctx.globalAlpha = t > 0.66 ? 0.22 : t > 0.33 ? 0.45 : 0.75; // …and fade in steps
+        ctx.fillRect(Math.round(p.x / SMOKE_PX) * SMOKE_PX, Math.round(p.y / SMOKE_PX) * SMOKE_PX - size, size, size);
+      }
+      ctx.globalAlpha = 1;
 
       /* draw & check obstacles */
       for (let i = s.obstacles.length - 1; i >= 0; i--) {
@@ -454,6 +570,19 @@ export default function DinoGame() {
         if (o.x + o.w < 0) { s.obstacles.splice(i, 1); continue; }
 
         if (o.kind === 'cactus') drawBuilding(ctx, o);
+        else if (o.art === 'ufo') {
+          // pixel-art spaceship: drawn crisp in its original orientation, centred on the plane-sized hitbox
+          const ufo = imgs.current!.ufo;
+          if (ufo.complete && ufo.naturalWidth > 0) {
+            const uw = 64, uh = Math.round((64 * ufo.naturalHeight) / ufo.naturalWidth);
+            const bob = Math.round(Math.sin((s.wingFrame + s.wingTick / 10) * 0.8) * 2); // slight hover, visual only
+            ctx.save();
+            ctx.imageSmoothingEnabled = false;
+            ctx.translate(o.x + o.w / 2, o.y + o.h / 2 + bob);
+            ctx.drawImage(ufo, -uw / 2, -uh / 2, uw, uh);
+            ctx.restore();
+          }
+        }
         else drawPlane(ctx, o);
 
         /* collision — tight hitbox */
@@ -470,13 +599,21 @@ export default function DinoGame() {
           hbTop           < o.y + o.h - my &&
           hbBottom        > o.y + my
         ) {
-          s.state = 'dead';
-          playSound('die');
+          if (s.state !== 'dead') { // only the first hit of a frame triggers the crash
+            s.state = 'dead';
+            // impact burst at the middle of the overlap between the character and the obstacle
+            const ix = (Math.max(DINO_X + mx, o.x + mx) + Math.min(DINO_X + dw - mx, o.x + o.w - mx)) / 2;
+            const iy = (Math.max(hbTop, o.y + my) + Math.min(hbBottom, o.y + o.h - my)) / 2;
+            spawnImpact(s.impact, ix, iy, o.kind);
+            s.shake = 14;
+            playSound('die');
+          }
         }
       }
 
       /* draw character */
       drawCharacter(ctx, d, s.state);
+      drawImpact(ctx, s.impact);
 
       /* HUD */
       ctx.fillStyle = isDark ? '#c8c8e8' : '#535353';

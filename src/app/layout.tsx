@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
+import { MusicProvider } from "@/components/MusicSection";
+import { PortalTransitionProvider } from "@/components/PortalTransition";
 
 export const metadata: Metadata = {
   title: "BastaEmmani — Application Developer",
@@ -20,7 +23,14 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/pp-neue-montreal" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <MusicProvider>
+          <PortalTransitionProvider>
+            <Navbar />
+            {children}
+          </PortalTransitionProvider>
+        </MusicProvider>
+      </body>
     </html>
   );
 }
