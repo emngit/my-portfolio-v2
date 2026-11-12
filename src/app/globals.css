@@ -400,6 +400,7 @@ body {
   align-items: center;
   justify-content: center;
   animation: portal-breathe 5s ease-in-out infinite;
+  cursor: pointer;
 }
 
 @keyframes portal-breathe {
@@ -481,6 +482,26 @@ body {
 .rg-exp-timeline { padding-right: 0; }
 /* page-wide Aurora: let the fixed backdrop show through the section backgrounds */
 main > section, main > footer { background-color: transparent !important; }
+
+/* Responsive Portal Gateway */
+.rg-portal-mobile {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  margin-top: 48px;
+}
+.rg-portal-desktop {
+  display: none !important;
+}
+
+@media (min-width: 1024px) {
+  .rg-portal-mobile {
+    display: none !important;
+  }
+  .rg-portal-desktop {
+    display: block !important;
+  }
+}
 
 .rg-player-line { display: none; }
 .rg-ticker-dup { display: none; }

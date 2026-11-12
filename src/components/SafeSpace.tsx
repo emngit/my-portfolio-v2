@@ -3,8 +3,31 @@
 import { useEffect } from 'react';
 import type { ComponentType, CSSProperties } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from 'framer-motion';
 import ParticlesRaw from './Particles';
+
+function PixelArrowLeft({ size = 10 }: { size?: number }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size * 2}
+      viewBox="0 0 10 20"
+      fill="currentColor"
+      style={{ transform: 'scaleX(-1)', position: 'relative', zIndex: 1, flexShrink: 0 }}
+      aria-hidden="true"
+    >
+      <rect x="6" y="9" width="2" height="2" />
+      <rect x="4" y="7" width="2" height="2" />
+      <rect x="2" y="5" width="2" height="2" />
+      <rect x="4" y="11" width="2" height="2" />
+      <rect x="2" y="13" width="2" height="2" />
+      <rect x="0" y="15" width="2" height="2" />
+      <rect x="0" y="3"  width="2" height="2" />
+    </svg>
+  );
+}
 
 // Particles.jsx is plain JS, so TS infers every defaulted prop as required - declare the ones we use.
 const Particles = ParticlesRaw as ComponentType<{
@@ -137,12 +160,58 @@ export default function SafeSpace() {
         initial={{ opacity: 0, scale: 0.92 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.9, delay: 0.5, ease: 'easeOut' }}
-        style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          padding: '0 24px',
+          zIndex: 2,
+          position: 'relative',
+        }}
       >
-        <h1 style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
-          Safe Space..
-          Coming Soon... IG XD
-        </h1>
+        <div style={{ maxWidth: 540, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+          <h1
+            style={{
+              fontFamily: '"Press Start 2P", monospace',
+              fontSize: 'clamp(14px, 4vw, 20px)',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.7)',
+              lineHeight: 1.6,
+              margin: 0,
+            }}
+          >
+            Safe Space..
+          </h1>
+          <p
+            style={{
+              fontFamily: '"Press Start 2P", monospace',
+              fontSize: 'clamp(9px, 2.6vw, 12px)',
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.38)',
+              lineHeight: 1.8,
+              margin: 0,
+            }}
+          >
+            Coming Soon... IG XD
+          </p>
+
+          <Link
+            href="/"
+            className="btn-spotify"
+            style={{
+              marginTop: 24,
+              textDecoration: 'none',
+            }}
+          >
+            <PixelArrowLeft />
+            <span>Back to Earth</span>
+          </Link>
+        </div>
       </motion.div>
     </main>
   );

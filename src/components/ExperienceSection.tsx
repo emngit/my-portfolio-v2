@@ -222,10 +222,23 @@ export default function ExperienceSection() {
           </div>
         </div>
 
-        {/* Fixed portal — follows scroll via JS ref mutations, no React re-renders */}
+        {/* Mobile / Tablet portal — centered below the timeline */}
+        <div className="rg-portal-mobile">
+          <motion.div
+            className="portal-wrap"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            variants={fadeUp}
+          >
+            <PortalGateway />
+          </motion.div>
+        </div>
+
+        {/* Desktop fixed portal — follows scroll via JS ref mutations, no React re-renders */}
         <div
           ref={portalRef}
-          className="hidden lg:block"
+          className="rg-portal-desktop"
           style={{
             position: 'fixed',
             right: '6.25vw',
