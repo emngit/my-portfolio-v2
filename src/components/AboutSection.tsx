@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
@@ -140,7 +140,7 @@ export default function AboutSection() {
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} style={{ marginBottom: 56 }}>
           <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--color-purple-400)', marginBottom: 12 }}>About Me</p>
           <h2 className="text-heading-xl-new" style={{ color: 'var(--color-text-primary)' }}>
-            Detail-oriented. Systematic. <span className="gradient-text-purple">Creative.</span>
+            I am a sinah who's probably gonna <span className="gradient-text-purple">Sinigang. 🍲</span>
           </h2>
         </motion.div>
 
