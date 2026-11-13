@@ -246,8 +246,8 @@ export default function Navbar() {
                 <button className="btn-render-secondary" onClick={openResume} style={{ flex: 1, height: 40, fontSize: 13, justifyContent: 'center' }}>
                   <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 9 }}>Resume</span>
                 </button>
-                <button className="btn-render-primary" style={{ flex: 1, height: 40, fontSize: 13, justifyContent: 'center' }}>
-                  <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 9 }}>Hire Me</span>
+                <button className="btn-render-primary" onClick={() => go('#contact')} style={{ flex: 1, height: 40, fontSize: 13, justifyContent: 'center' }}>
+                  <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 9 }}>Let&apos;s Talk...</span>
                 </button>
               </div>
             </div>
