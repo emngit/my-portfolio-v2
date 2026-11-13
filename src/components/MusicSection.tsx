@@ -68,6 +68,7 @@ const FAVOURITES: Meta[] = [
   { name: 'Half-Life', artist: 'Duncan Sheik', url: 'https://open.spotify.com/track/4SwcSQIRh7M1dmzyYgCAHs', uri: 'spotify:track:4SwcSQIRh7M1dmzyYgCAHs', image: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e029d72caf1620ff39fe066d6f0' },
   { name: 'Unwell', artist: 'Matchbox Twenty', url: 'https://open.spotify.com/track/6Bm6qUCSatPAqkQllFL7oA', uri: 'spotify:track:6Bm6qUCSatPAqkQllFL7oA', image: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02b23d1b3eb6fcd4a6c892d4f7' },
   { name: 'Sincerity Is Scary', artist: 'The 1975', url: 'https://open.spotify.com/track/6HguG9HRb1Ke1bhihfE4m8', uri: 'spotify:track:6HguG9HRb1Ke1bhihfE4m8', image: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e026c582022e90b11f0da287a9a' },
+  { name: "B*tch, Don't Kill My Vibe", artist: 'Kendrick Lamar', url: 'https://open.spotify.com/track/5h5tBFnbcVioFXiOixTn6E', uri: 'spotify:track:5h5tBFnbcVioFXiOixTn6E', image: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e0278de8b28de36a74afc0348b5' },
 ];
 
 
