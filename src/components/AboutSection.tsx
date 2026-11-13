@@ -140,7 +140,12 @@ export default function AboutSection() {
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} style={{ marginBottom: 56 }}>
           <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--color-purple-400)', marginBottom: 12 }}>About Me</p>
           <h2 className="text-heading-xl-new" style={{ color: 'var(--color-text-primary)' }}>
-            I am a sinah who's probably gonna <span className="gradient-text-purple">Sinigang. 🍲</span>
+            I am a sinah who&apos;s probably gonna
+            <br />
+            <span className="gradient-text-purple">Sinigang.</span>
+            <span role="img" aria-label="soup" style={{ WebkitTextFillColor: 'initial', color: 'initial', display: 'inline-block' }}>
+              🍲
+            </span>
           </h2>
         </motion.div>
 
