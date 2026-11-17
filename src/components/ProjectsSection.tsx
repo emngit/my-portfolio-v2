@@ -46,6 +46,7 @@ const projects: Project[] = [
     metric: 'AI-powered',
     bannerType: 'kairos',
     githubUrl: 'https://github.com/emngit/Jira-Assistant',
+    demoUrl: 'https://kairos-demo-xi.vercel.app/',
   },
   {
     name: 'Kada Tipon Game',
